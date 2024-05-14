@@ -1,0 +1,11 @@
+# Please Download ffmpeg Manually in your system for the Speech-to-Text Functionality
+web3
+pydantic
+fastapi
+SQLAlchemy
+openai
+pydub
+gtts
+python-jose
+passlib
+bcrypt

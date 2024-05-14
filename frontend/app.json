@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Assistantify",
+    "slug": "atn",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "logo.png",
+    "splash": {
+      "image": "logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "logo.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "logo.png"
+    }
+  }
+}
