@@ -49,13 +49,21 @@ def setup_rewarding_system(app: "FastAPI"):
         value_as_str += request.amount
 
         value_as_int: int = int(value_as_str)
-
+        
+        base_account_address_converted = web3.to_checksum_address(
+            int(base_account_address.strip('"'), 16)
+        )
+        
         # Get the nonce
-        nonce = web3.eth.get_transaction_count(base_account_address)
-
+        nonce = web3.eth.get_transaction_count(base_account_address_converted)
+        
+        recipent_account_address_converted = web3.to_checksum_address(
+            int(request.account_address.strip('"'), 16)
+        )
+        print("RECIPENT", recipent_account_address_converted)
         # Build a transaction to call the contract's `transfer` function
         transaction = contract.functions.transfer(
-            request.account_address, value_as_int
+            recipent_account_address_converted, value_as_int
         ).build_transaction(
             {
                 "gas": 2000000,
@@ -70,9 +78,9 @@ def setup_rewarding_system(app: "FastAPI"):
         )
 
         # Send the transaction
-        txn_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        web3.eth.send_raw_transaction(signed_txn.rawTransaction)
 
-        return txn_hash
+        return "Rewarded the User!"
 
     @app.post("/get_account_balance")
     def get_account_balance(request: GetAccountBalanceRequest):
