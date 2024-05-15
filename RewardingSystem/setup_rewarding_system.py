@@ -16,6 +16,7 @@ from utils.database_utils import User, get_db
 
 import random
 
+
 class RewardUserRequest(BaseModel):
     account_address: str
     amount: str = "1"
@@ -44,8 +45,8 @@ def setup_rewarding_system(app: "FastAPI"):
     @app.post("/reward_user")
     def reward_user(request: RewardUserRequest):
         # Set the value to send
-        value_as_str: str = request.amount
-        value_as_str += "000000000000000000"
+        value_as_str: str= "00000000000000"
+        value_as_str += request.amount
 
         value_as_int: int = int(value_as_str)
 
@@ -75,14 +76,16 @@ def setup_rewarding_system(app: "FastAPI"):
 
     @app.post("/get_account_balance")
     def get_account_balance(request: GetAccountBalanceRequest):
-        print()
-        base_account_balance = web3.from_wei(
-            contract.functions.balanceOf(base_account_address).call(), "ether"
+        base_account_address_converted = web3.to_checksum_address(
+            int(base_account_address.strip('"'), 16)
         )
-        account_balance = web3.from_wei(
-            contract.functions.balanceOf(request.account_address).call(), "ether"
+        recipent_account_address_converted = web3.to_checksum_address(
+            int(request.account_address.strip('"'), 16)
         )
 
-        print(f"Balance of Base Account: {base_account_balance:.13f} tokens")
+        base_account_balance = contract.functions.balanceOf(base_account_address_converted).call()
+        account_balance = contract.functions.balanceOf(recipent_account_address_converted).call()
 
-        return f"{account_balance:.0f}"
+        print("BASE ACC BALANCE: ", base_account_balance)
+
+        return str(account_balance).lstrip('0')

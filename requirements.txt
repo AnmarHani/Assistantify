@@ -1,6 +1,7 @@
 # Please Download ffmpeg Manually in your system for the Speech-to-Text Functionality
 web3
 pydantic
+uvicorn
 fastapi
 SQLAlchemy
 openai
@@ -9,3 +10,6 @@ gtts
 python-jose
 passlib
 bcrypt
+broadlink
+matplotlib
+seaborn

@@ -23,10 +23,10 @@ contract Assistantoin {
     // Emitted when the allowance of a `spender` for an `owner` is set by a call to `approve`. `value` is the new allowance
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-    constructor(string memory name_, string memory symbol_, uint256 initialSupply) public {
+    constructor(string memory name_, string memory symbol_, uint256 initialSupply, address initialHolder) public {
         _name = name_;
         _symbol = symbol_;
-        _mint(msg.sender, initialSupply);
+        _mint(initialHolder, initialSupply);
     }
 
     function name() public view returns (string memory) {

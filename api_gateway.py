@@ -100,4 +100,4 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, port=PORT, host=HOST)
+    uvicorn.run("api_gateway:app", port=PORT, host=HOST, reload=True)
