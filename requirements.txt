@@ -11,6 +11,7 @@ python-jose
 passlib
 bcrypt
 broadlink
+numpy
 pandas
 matplotlib
 seaborn

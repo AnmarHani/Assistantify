@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime, create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy import DateTime, create_engine, Column, Integer, String, ForeignKey, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session
 from datetime import datetime
@@ -32,7 +32,9 @@ class User(Base):
     age = Column(Integer)
     country = Column(String)
     health = relationship("Health", back_populates="user", uselist=False)
-    points = relationship("Points", back_populates="user")
+
+    finance = relationship("Finance", back_populates="user", uselist=False)
+    productivity = relationship("Productivity", back_populates="user", uselist=False)
     blockchain_account = Column(String, unique=False, index=True)
 
 
@@ -50,15 +52,35 @@ class Health(Base):
     user = relationship("User", back_populates="health")
 
 
-class Points(Base):
-    __tablename__ = "points"
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    points = Column(Integer)
-    date_time = Column(DateTime, default=datetime.utcnow)
+class Finance(Base):
+    __tablename__ = "finance"
 
-    user = relationship("User", back_populates="points")
+    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    income = Column(Float)
+    expenses = Column(Float)
+    savings = Column(Float)
+    investments = Column(Float)
+    debts = Column(Float)
+    credit_score = Column(Integer)
+    financial_goals = Column(String)
+    monthly_budget = Column(Float)
+    user = relationship("User", back_populates="finance")
+
+class Productivity(Base):
+    __tablename__ = "productivity"
+
+    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    daily_tasks_completed = Column(Integer)
+    weekly_tasks_completed = Column(Integer)
+    monthly_tasks_completed = Column(Integer)
+    hours_worked_daily = Column(Float)
+    hours_worked_weekly = Column(Float)
+    hours_worked_monthly = Column(Float)
+    breaks_taken_daily = Column(Integer)
+    breaks_taken_weekly = Column(Integer)
+    breaks_taken_monthly = Column(Integer)
+    user = relationship("User", back_populates="productivity")
 
 
 Base.metadata.create_all(bind=engine)
