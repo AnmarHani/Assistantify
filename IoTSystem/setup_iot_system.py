@@ -27,7 +27,7 @@ def learn_ir_code():
             print("No data received")
             return
         else:
-            return
+            return data
 
 
 def setup_iot_system(app: "FastAPI"):
