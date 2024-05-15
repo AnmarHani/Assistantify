@@ -9,7 +9,9 @@ import requests
 from ProcessingSystem.setup_processing_system import setup_processing_system
 from RewardingSystem.setup_rewarding_system import setup_rewarding_system
 from AnalyticsSystem.setup_analytics_system import setup_analytics_system
+from IoTSystem.setup_iot_system import setup_iot_system
 
+from utils.constants import PORT, HOST
 from utils.database_utils import get_db, User
 from utils.authentication_utils import (
     get_password_hash,
@@ -17,9 +19,6 @@ from utils.authentication_utils import (
     authenticate_user,
     create_access_token,
 )
-
-HOST = "192.168.3.6"
-PORT = 9123
 
 
 class Message(BaseModel):
@@ -44,13 +43,6 @@ class Token(BaseModel):
     token_type: str
 
 
-class UserPublicProfile(BaseModel):
-    username: str
-    email: str
-    age: int
-    country: str
-
-
 app = FastAPI()
 
 origins = ["*"]
@@ -65,6 +57,8 @@ app.add_middleware(
 setup_rewarding_system(app)
 setup_processing_system(app)
 setup_analytics_system(app)
+setup_iot_system(app)
+
 
 @app.get("/")
 async def main():
@@ -76,7 +70,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     hashed_password = get_password_hash(user.password)
     blockchain_address = requests.get(
         f"http://{HOST}:{PORT}/get_new_user_blockchain_account"
-    )
+    ).text
     db_user = User(
         username=user.username,
         email=user.email,
@@ -103,18 +97,6 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Incorrect username or password")
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@app.get("/user/profile", response_model=UserPublicProfile)
-def get_user_profile(
-    current_user: str = Depends(get_current_user), db: Session = Depends(get_db)
-):
-    user = db.query(User).filter(User.username == current_user).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return UserPublicProfile(
-        username=user.username, email=user.email, age=user.age, country=user.country
-    )
 
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@ from RewardingSystem.assistantoin_config import (
 from utils.authentication_utils import get_current_user
 from utils.database_utils import User, get_db
 
+import random
 
 class RewardUserRequest(BaseModel):
     account_address: str
@@ -36,11 +37,9 @@ contract = web3.eth.contract(address=contract_address, abi=contract_abi)
 
 def setup_rewarding_system(app: "FastAPI"):
     @app.get("/get_new_user_blockchain_account")
-    def get_new_user_blockchain_account(
-        current_user: str = Depends(get_current_user), db: Session = Depends(get_db)
-    ):
-        new_account = web3.eth.account.create()
-        return new_account.address
+    def get_new_user_blockchain_account():
+        accounts = web3.eth.accounts
+        return random.choice(accounts)
 
     @app.post("/reward_user")
     def reward_user(request: RewardUserRequest):
@@ -76,6 +75,7 @@ def setup_rewarding_system(app: "FastAPI"):
 
     @app.post("/get_account_balance")
     def get_account_balance(request: GetAccountBalanceRequest):
+        print()
         base_account_balance = web3.from_wei(
             contract.functions.balanceOf(base_account_address).call(), "ether"
         )

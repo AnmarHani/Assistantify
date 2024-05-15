@@ -1,5 +1,5 @@
-base_account_private_key = '0xdf1c9ea0f925bc5f9191c0efb2f2fd386023fc2bbe1babb7dbb7a7b7f23d07e0'
-base_account_address = '0x5E74c269af19Be6bcd796FD8c8599DB6eBc9b950'
+base_account_private_key = '0x462cefb05c00f98aeba627b2acdeeddd0c8c816c5e371a7907e8cf9032320a0e'
+base_account_address = '0x6A47D2F113Ab617F320Caf05cd164C62e1f1Db46'
 
 contract_address = "0x9a3D8880E092e3a49f5041A7a901cacc7165674c"
 contract_abi = [

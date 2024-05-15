@@ -1,12 +1,19 @@
-from typing import TYPE_CHECKING
-from fastapi import Request
-import openai
 import base64
 import io
 import os
-from pydub import AudioSegment
-from gtts import gTTS
+from typing import TYPE_CHECKING
+
+import openai
+import requests
 from dotenv import load_dotenv
+from fastapi import Depends, Request
+from gtts import gTTS
+from pydub import AudioSegment
+from sqlalchemy.orm import Session
+
+from utils.authentication_utils import get_current_user
+from utils.constants import HOST, PORT
+from utils.database_utils import User, get_db
 
 if TYPE_CHECKING: 
     from fastapi import FastAPI
@@ -60,10 +67,15 @@ def setup_processing_system(app: "FastAPI"):
 
 
     @app.post("/chat")
-    async def chat(request: Request):
+    async def chat(request: Request, current_user: str = Depends(get_current_user), db: Session = Depends(get_db)):
         data = await request.json()
         message = data["message"]
-
+        user = db.query(User).filter(User.username == current_user).first()
         response = send_to_gpt(message)
-        return {"response": response}
+        coins = requests.post(f"http://{HOST}:{PORT}/get_account_balance", {
+            "account_address": user.blockchain_account
+        }).text
+        
+        
+        return {"response": response, "coins": coins}
 
