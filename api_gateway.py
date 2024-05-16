@@ -11,6 +11,8 @@ from RewardingSystem.setup_rewarding_system import setup_rewarding_system
 from AnalyticsSystem.setup_analytics_system import setup_analytics_system
 from IoTSystem.setup_iot_system import setup_iot_system
 
+from utils.fake_data_generator import insert_fake_data
+
 from utils.constants import PORT, HOST
 from utils.database_utils import get_db, User
 from utils.authentication_utils import (
@@ -54,6 +56,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 setup_rewarding_system(app)
 setup_processing_system(app)
 setup_analytics_system(app)
@@ -81,8 +84,11 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     )
 
     db.add(db_user)
+
+    
     try:
         db.commit()
+        insert_fake_data(db, db_user.id)
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="Username or email already exists")

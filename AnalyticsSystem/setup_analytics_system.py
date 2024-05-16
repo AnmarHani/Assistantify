@@ -1,14 +1,19 @@
-from typing import TYPE_CHECKING
-from fastapi import Request, Depends, HTTPException
-from sqlalchemy.orm import Session
-from utils.database_utils import User, Health, get_db, Productivity, Finance
-from utils.authentication_utils import get_current_user
-import seaborn as sns
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
 import base64
 from io import BytesIO
+from typing import TYPE_CHECKING
+
+import matplotlib
+
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from fastapi import Depends, HTTPException, Request
+from sqlalchemy.orm import Session
+
+from utils.authentication_utils import get_current_user
+from utils.database_utils import Finance, Health, Productivity, User, get_db
 
 if TYPE_CHECKING:
     from fastapi import FastAPI

@@ -1,4 +1,12 @@
-from sqlalchemy import DateTime, create_engine, Column, Integer, String, ForeignKey, Float
+from sqlalchemy import (
+    DateTime,
+    create_engine,
+    Column,
+    Integer,
+    String,
+    ForeignKey,
+    Float,
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session
 from datetime import datetime
@@ -52,11 +60,10 @@ class Health(Base):
     user = relationship("User", back_populates="health")
 
 
-
 class Finance(Base):
     __tablename__ = "finance"
 
-    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     income = Column(Float)
     expenses = Column(Float)
     savings = Column(Float)
@@ -67,10 +74,11 @@ class Finance(Base):
     monthly_budget = Column(Float)
     user = relationship("User", back_populates="finance")
 
+
 class Productivity(Base):
     __tablename__ = "productivity"
 
-    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     daily_tasks_completed = Column(Integer)
     weekly_tasks_completed = Column(Integer)
     monthly_tasks_completed = Column(Integer)

@@ -8,28 +8,25 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
-import Constants from 'expo-constants';
+import config from './config'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = () => {
-  const manifest = Constants.manifest ?? {};
-
-  const url = `http://192.168.3.6:9123`;
-
+  const [coins, setCoins] = useState('0');
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [recording, setRecording] = useState(false);
-  const audioRecorderPlayer = new AudioRecorderPlayer();
-  const path = 'sdcard/voice.mp4'; // Specify path to save audio file
 
-  const handleSend = () => {
+  const handleSend = async() => {
+    const token = await AsyncStorage.getItem('userToken');
     // Send message to backend
-    fetch(url + '/chat', {
+    fetch(config.url + '/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': token
       },
       body: JSON.stringify({ message }),
     })
@@ -41,6 +38,7 @@ const Home = () => {
           { user: 'Bot', text: data.response },
         ]);
         setMessage('');
+        setCoins(data.coins);
       });
   };
 
@@ -55,6 +53,8 @@ const Home = () => {
   };
 
   const handleVoice = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+
     if (!recording) {
       // Start recording
       console.log('Requesting permissions..');
@@ -75,10 +75,11 @@ const Home = () => {
       const fileBase64 = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
-      fetch(url + '/voice', {
+      fetch(config.url + '/voice', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': token
         },
         body: JSON.stringify({ file: fileBase64 }),
       })
@@ -94,6 +95,7 @@ const Home = () => {
             { user: 'You', text: data.user_message },
             { user: 'Bot', text: data.system_message },
           ]);
+          setCoins(data.coins);
           handlePlay(audioUri);
         });
       setRecording(null);
@@ -107,7 +109,7 @@ const Home = () => {
       <View style={styles.coinContainer}>
         <Text style={styles.coinText}>ATN</Text>
         <Image style={styles.coinIcon} source={require('./assistantoin.png')} />
-        <Text style={styles.coinText}>0</Text>
+        <Text style={styles.coinText}>{coins}</Text>
       </View>
     </View>
 

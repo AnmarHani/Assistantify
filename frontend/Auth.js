@@ -1,25 +1,48 @@
 import React, { useState } from 'react';
 import { Button, TextInput, View, StyleSheet, Text, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-simple-toast';
+import config from './config'
 
 const Auth = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSignIn = async () => {
-    // Send sign in request to backend
-    // For simplicity, let's assume the backend returns a token
-    const token = 'your_token_from_backend';
-    await AsyncStorage.setItem('userToken', token);
-    navigation.replace('Home');
+    fetch(config.url + '/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ "username": username, "password": password}),
+    })
+      .then((response) => response.json())
+      .then(async(data) => {
+        const token = "Bearer " + data.access_token;
+        await AsyncStorage.setItem('userToken', token);
+        Toast.show("Login Successful!");
+        navigation.replace('Home');
+      })
+      .catch((e) => {
+        Toast.show(e);
+      })
   };
 
   const handleSignUp = async () => {
-    // Send sign up request to backend
-    // For simplicity, let's assume the backend returns a token
-    const token = 'your_token_from_backend';
-    await AsyncStorage.setItem('userToken', token);
-    navigation.replace('Home');
+        fetch(config.url + '/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ "username": username, "password": password, email:`${username}@gmail.com`, age: 18, country: "Saudi Arabia" }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        Toast.show('User Registered, Please Login.');
+      })
+      .catch((e)=> {
+        Toast.show(e);
+      })
   };
 
   return (
