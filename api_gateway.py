@@ -88,7 +88,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     
     try:
         db.commit()
-        insert_fake_data(db, db_user.id)
+        insert_fake_data(db, db_user.id, False)
     except IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="Username or email already exists")

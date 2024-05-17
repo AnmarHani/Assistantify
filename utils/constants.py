@@ -1,4 +1,4 @@
+import netifaces
 
-
-HOST = "192.168.100.5"
+HOST = netifaces.ifaddresses('en0')[2][0]["addr"]
 PORT = 9123

@@ -38,6 +38,7 @@ async def send_to_gpt(message: str, user, db: Session):
         with data: {finance_prompt(user, db)}, {health_prompt(user, db)}, {productivity_prompt(user, db)} in the financial, health, and productivity life domains respectively. 
         Any message will be based on this data, Give them helpful  advices, suggestions, and predictions them based on the message they have sent and their data that is given to you.
     """
+    detected_language = detect(message)
 
     if (
         "clean" in message.lower()
@@ -47,6 +48,8 @@ async def send_to_gpt(message: str, user, db: Session):
     ):
         async with httpx.AsyncClient() as client:
             await client.get(f"http://{HOST}:{PORT}/device_on")
+        if detected_language == "ar": 
+            return "ابشر، الان ببدا انظف!"
         return "Sure! I will start cleaning now."
 
     if (
@@ -57,6 +60,8 @@ async def send_to_gpt(message: str, user, db: Session):
     ):
         async with httpx.AsyncClient() as client:
             await client.get(f"http://{HOST}:{PORT}/device_off")
+        if detected_language == "ar": 
+            return "ان شاءالله نكون ادينا الواجب"
         return "Okay, Turning Off."
 
     if (
@@ -67,6 +72,7 @@ async def send_to_gpt(message: str, user, db: Session):
         or "خطوة" in message.lower()
         or "تفاح" in message.lower()
         or "إنجاز" in message.lower()
+        or "نجزت" in message.lower()
     ):
         async with httpx.AsyncClient() as client:
             await client.post(
@@ -79,6 +85,8 @@ async def send_to_gpt(message: str, user, db: Session):
             or "خمسة" in message.lower()
             or "خمس" in message.lower()
         ):
+            if detected_language == "ar": 
+                return "ماشاءالله! إنجاز رِياضي مُمتاز! اكيد هذا الشيء بيحسن من صحتك.... وبعطيك جاظزة عُملة واحدة من ATN"
             return "Wow! You have Walked 5000 Steps, Here is 1 ATN Coin"
         elif (
             "ate" in message.lower()
@@ -86,8 +94,12 @@ async def send_to_gpt(message: str, user, db: Session):
             or "اكل" in message.lower()
             or "أكل" in message.lower()
         ):
+            if detected_language == "ar": 
+                return "اختيار مُوَفِّق، اكْل التفاح يُعتبر شيء جيد لصحتك... وبعطيك جائزة عُملة واحدة من ATN"
             return "Nice Choice, Eating Apple is Healthy, Here is 1 ATN Coin"
         else:
+            if detected_language == "ar": 
+                return "انجازات اكثر من رائعة! نبغَى نسمع انجازات اكثر واكثر باذن الله، بعطيك جائزة على هذه الانجازات، عبارة عن عُملة واحدة من ATN"
             return "Wow! You have Achieved All This, Here is 1 ATN Coin"
 
     session = [
@@ -128,13 +140,16 @@ def setup_processing_system(app: "FastAPI"):
             response = openai.audio.transcriptions.create(model="whisper-1", file=f)
             gpt_message = await send_to_gpt(response.text, user, db)
 
-        detected_language = detect(gpt_message)
 
-        tts = gTTS(gpt_message, lang=detected_language)  # Convert text to speech
-        if os.path.exists("response.mp3"):
-            os.remove("response.mp3")
-        tts.save("response.mp3")  # Save the speech audio into a file
+        tts_response = openai.audio.speech.create(
+            model="tts-1",  # Choose the desired TTS model
+            voice="onyx",  # Choose the voice (e.g., alloy, echo, fable, etc.)
+            input=gpt_message,
+        )
 
+        # Save the speech audio into a file
+        tts_response.stream_to_file("response.mp3")
+        
         with open("response.mp3", "rb") as f:
             audio_response = base64.b64encode(f.read()).decode(
                 "utf-8"
