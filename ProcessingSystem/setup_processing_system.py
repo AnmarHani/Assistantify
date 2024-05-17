@@ -1,26 +1,28 @@
+import asyncio
 import base64
 import io
 import json
 import os
 from typing import TYPE_CHECKING
+
 import httpx
 import openai
 import requests
 from dotenv import load_dotenv
 from fastapi import Depends, Request
 from gtts import gTTS
+from langdetect import detect
 from pydub import AudioSegment
 from sqlalchemy.orm import Session
-import asyncio
 
-from utils.authentication_utils import get_current_user
-from utils.constants import HOST, PORT
-from utils.database_utils import User, get_db
 from AnalyticsSystem.prompt_functions import (
     finance_prompt,
     health_prompt,
     productivity_prompt,
 )
+from utils.authentication_utils import get_current_user
+from utils.constants import HOST, PORT
+from utils.database_utils import User, get_db
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
@@ -126,7 +128,9 @@ def setup_processing_system(app: "FastAPI"):
             response = openai.audio.transcriptions.create(model="whisper-1", file=f)
             gpt_message = await send_to_gpt(response.text, user, db)
 
-        tts = gTTS(gpt_message, lang="en")  # Convert text to speech
+        detected_language = detect(gpt_message)
+
+        tts = gTTS(gpt_message, lang=detected_language)  # Convert text to speech
         if os.path.exists("response.mp3"):
             os.remove("response.mp3")
         tts.save("response.mp3")  # Save the speech audio into a file
