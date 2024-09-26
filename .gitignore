@@ -1,0 +1,7 @@
+.mypy_cache
+node_modules
+.env
+__pycache__
+response.mp3
+temp.wav
+package-lock.json
