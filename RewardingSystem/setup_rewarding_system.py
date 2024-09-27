@@ -10,6 +10,7 @@ from RewardingSystem.assistantoin_config import (
     base_account_private_key,
     contract_abi,
     contract_address,
+    ganache_server
 )
 from utils.authentication_utils import get_current_user
 from utils.database_utils import User, get_db
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
     from fastapi import FastAPI
 
 # Connect to Ganache
-web3 = Web3(HTTPProvider("http://ganache:8545"))
+web3 = Web3(HTTPProvider(ganache_server))
 
 # Initialize the contract
 contract = web3.eth.contract(address=contract_address, abi=contract_abi)

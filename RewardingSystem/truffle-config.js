@@ -1,3 +1,5 @@
+const Web3 = require('web3');
+
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -70,8 +72,7 @@ module.exports = {
       network_id: "*", // Any network (default: none)
     },
     production: {
-      host: "atn-reward-system.onrender.com", // Localhost (default: none)
-      port: 8545, // Standard Ethereum port (default: none)
+      provider: () => new Web3.providers.HttpProvider("https://atn-reward-system.onrender.com"),
       network_id: "*", // Any network (default: none)
       networkCheckTimeout: 100000, // Set a high timeout value in milliseconds (100 seconds)
       timeoutBlocks: 200, // Number of blocks to wait for a transaction before timing out

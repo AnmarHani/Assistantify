@@ -1,9 +1,20 @@
-base_account_private_key = (
-    "0x849308eb66842fba203da62ac0abbc4f34d08fee0727c04ff701d4ea60d07688"
-)
-base_account_address = "0xBa88fb3cBe0D82fC7FF827608B0AD2a3A4BaCDb6"
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-contract_address = "0xCa0Da2766B7BfC0e0EA221448174a4e11Fdf79B0"
+base_account_private_key = os.getenv("BASE_ACC_PRIVATE_KEY") 
+# "0x849308eb66842fba203da62ac0abbc4f34d08fee0727c04ff701d4ea60d07688"
+
+base_account_address = os.getenv("BASE_ACC_ADDR")
+# "0xBa88fb3cBe0D82fC7FF827608B0AD2a3A4BaCDb6"
+
+contract_address = os.getenv("CONTRACT_ADDR")
+# "0xCa0Da2766B7BfC0e0EA221448174a4e11Fdf79B0"
+
+ganache_server = os.getenv("GANACHE_SERVER")
+
+
+
 contract_abi = [
     {
         "inputs": [
