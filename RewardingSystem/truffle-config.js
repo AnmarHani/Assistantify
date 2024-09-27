@@ -1,4 +1,5 @@
-const Web3 = require('web3');
+// const Web3 = require('web3');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 /**
  * Use this file to configure your truffle project. It's seeded with some
@@ -72,7 +73,13 @@ module.exports = {
       network_id: "*", // Any network (default: none)
     },
     production: {
-      provider: () => new Web3.providers.HttpProvider("https://atn-reward-system.onrender.com"),
+      provider: () => new HDWalletProvider({
+        url: "https://atn-reward-system.onrender.com",
+        privateKeys: [
+          "0xe1d84e821221b8deab74c480a83a71c7fda0e4e0c4d11a592a7704311ad64126"
+        ],
+        providerOrUrl: "https://atn-reward-system.onrender.com",
+      }),
       network_id: "*", // Any network (default: none)
       networkCheckTimeout: 100000, // Set a high timeout value in milliseconds (100 seconds)
       timeoutBlocks: 200, // Number of blocks to wait for a transaction before timing out

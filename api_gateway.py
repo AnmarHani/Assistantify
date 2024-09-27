@@ -85,7 +85,6 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
     db.add(db_user)
 
-    
     try:
         db.commit()
         insert_fake_data(db, db_user.id, False)
@@ -93,7 +92,10 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=400, detail="Username or email already exists")
     db.refresh(db_user)
-    return {"message": "User created successfully"}
+    return {
+        "message": "User created successfully",
+        "account_address": blockchain_address,
+    }
 
 
 @app.post("/login", response_model=Token)
