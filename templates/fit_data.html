@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Google Fit Data</title>
+</head>
+
+<body>
+    <h1>Your Google Fit Data</h1>
+    <ul>
+        <li><strong>Weight:</strong> {{ weight }} kg</li>
+        <li><strong>Height:</strong> {{ height }} meters</li>
+        <li><strong>Active Minutes:</strong> {{ active_minutes }} minutes</li>
+        <li><strong>Activity Segment:</strong> {{ activity_segment }}</li>
+        <li><strong>BMR Calories:</strong> {{ bmr_calories }} kcal</li>
+        <li><strong>Calories Expended:</strong> {{ expended_calories }} kcal</li>
+        <li><strong>Step Count:</strong> {{ step_count }} steps</li>
+        <li><strong>Distance:</strong> {{ distance }} meters</li>
+        <li><strong>Heart Minutes:</strong> {{ heart_minutes }} minutes</li>
+        <li><strong>Speed:</strong> {{ speed }} m/s</li>
+    </ul>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+
+</html>
