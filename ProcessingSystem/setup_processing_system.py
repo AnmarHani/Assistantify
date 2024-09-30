@@ -22,7 +22,7 @@ from AnalyticsSystem.prompt_functions import (
     productivity_prompt,
 )
 from utils.authentication_utils import get_current_user
-from utils.constants import HOST, PORT
+from utils.constants import HOST, PORT, GPT_MODEL, VOICE_MODEL
 from utils.database_utils import User, get_db
 
 if TYPE_CHECKING:
@@ -48,7 +48,7 @@ async def send_to_gpt(message: str, user, db: Session):
     ]
 
     response = openai.chat.completions.create(
-        model="gpt-4o-mini",
+        model=GPT_MODEL,
         messages=[{"role": msg["role"], "content": msg["content"]} for msg in session],
     )
 
@@ -76,7 +76,7 @@ async def transcribe_audio(file_path: str):
 
 async def text_to_voice(text: str):
     tts_response = openai.audio.speech.create(
-        model="tts-1",  # Choose the desired TTS model
+        model=VOICE_MODEL,  # Choose the desired TTS model
         voice="onyx",  # Choose the voice (e.g., alloy, echo, fable, etc.)
         input=text,
     )
@@ -101,6 +101,9 @@ def setup_processing_system(app: "FastAPI"):
         # Convert the image to base64
         base64_image = base64.b64encode(file_bytes).decode("utf-8")
 
+        # docker tag atn_api_gateway anmarhani/atn_api_gateway
+        # docker push anmarhani/atn_api_gateway
+
         image_session = [
             {
                 "role": "user",
@@ -115,7 +118,7 @@ def setup_processing_system(app: "FastAPI"):
         ]
 
         image_response = openai.chat.completions.create(
-            model="gpt-4o-mini",
+            model=GPT_MODEL,
             messages=[
                 {"role": msg["role"], "content": msg["content"]}
                 for msg in image_session
@@ -126,10 +129,23 @@ def setup_processing_system(app: "FastAPI"):
         combined_message = str(message) + " " + "The Image is: " + image_text
         user: User = db.query(User).filter(User.username == current_user).first()
         gpt_response = await send_to_gpt(combined_message, user, db)
-        return gpt_response
 
-    @app.post("/audio/")
-    async def audio(
+        if os.getenv("BLOCKCHAIN_ENV") == "True":
+            async with httpx.AsyncClient() as client:
+                blockchain_balance = await client.post(
+                    f"http://{HOST}:{PORT}/get_account_balance",
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps({"account_address": f"{user.blockchain_account}"}),
+                )
+
+            coins = blockchain_balance.text
+        else:
+            coins = 0
+
+        return {"bot_message": gpt_response, "coins": coins}
+
+    @app.post("/voice/")
+    async def voice(
         file: UploadFile = File(...),
         current_user: str = Depends(get_current_user),
         db: Session = Depends(get_db),
@@ -181,7 +197,8 @@ def setup_processing_system(app: "FastAPI"):
         # Step 3: Return the mp3 file path as a response
         return {
             "file_path": f"https://atn-api-gateway.onrender.com/code/static/response.mp3",
-            "system_message": gpt_response,
+            "bot_message": gpt_response,
+            "user_message": voice_to_text,
             "coins": coins,
         }
 
@@ -209,4 +226,4 @@ def setup_processing_system(app: "FastAPI"):
         else:
             coins = 0
 
-        return {"response": response, "coins": coins}
+        return {"bot_message": response, "coins": coins}

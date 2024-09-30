@@ -52,3 +52,8 @@ volumes:
 # base_account_address = "0x927cca6E5Cd04176f792DEa87C06B08E64aBf5Ec"
 
 # contract_address = "0xCa0Da2766B7BfC0e0EA221448174a4e11Fdf79B0"
+
+# I NEED TO ALWAYS MANUALLY UPDATE THIS IN MY MACOS!
+# vim ~/.docker/config.json
+
+# credsStore -> credStore
