@@ -12,8 +12,8 @@ COPY ./requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-
-COPY ./ /code/app
+COPY static /code/static
+COPY . /code/app
 
 
 CMD ["python3", "app/api_gateway.py"]

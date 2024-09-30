@@ -4,3 +4,4 @@ __pycache__
 response.mp3
 temp.wav
 package-lock.json
+.env
