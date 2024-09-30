@@ -22,7 +22,9 @@ from utils.authentication_utils import (
     create_access_token,
 )
 
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 class Message(BaseModel):
     message: str
 
@@ -57,11 +59,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-setup_rewarding_system(app)
+if(os.getenv("BLOCKCHAIN_ENV") == "True"): setup_rewarding_system(app)
 setup_processing_system(app)
 setup_analytics_system(app)
-setup_iot_system(app)
+if(os.getenv("IOT_ENV") == "True"): setup_iot_system(app)
 
+from fastapi.staticfiles import StaticFiles
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+print("#############################")
+print("-------WORKING SYSTEMS-------")
+print(f"BLOCKCHAIN SYSTEM: {True if os.getenv('BLOCKCHAIN_ENV') == 'True' else False}")
+print("PROCESSING SYSTEM: True")
+print("ANALYTICS SYSTEM: True")
+print(f"IOT SYSTEM: {True if os.getenv('IOT_ENV') == 'True' else False}")
+print(f"IS DEVELOPMENT?: {True if os.getenv('DEV') == 'True' else False}")
+print("#############################")
 
 @app.get("/")
 async def main():
@@ -71,9 +85,14 @@ async def main():
 @app.post("/register", response_model=Message)
 def register(user: UserCreate, db: Session = Depends(get_db)):
     hashed_password = get_password_hash(user.password)
-    blockchain_address = requests.get(
-        f"http://{HOST}:{PORT}/get_new_user_blockchain_account"
-    ).text
+    
+    if(os.getenv("BLOCKCHAIN_ENV") == "True"):
+        blockchain_address = requests.get(
+            f"http://{HOST}:{PORT}/get_new_user_blockchain_account"
+        ).text
+    else:
+        blockchain_address = "0x43eB3A2Af4b2eC285FcaA58Fe912880F3a58154a"
+    
     db_user = User(
         username=user.username,
         email=user.email,
@@ -108,4 +127,4 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
 
 
 if __name__ == "__main__":
-    uvicorn.run("api_gateway:app", port=PORT, host=HOST, reload=True)
+    uvicorn.run("api_gateway:app", port=PORT, host=HOST, reload=True if os.getenv('DEV') == "True" else False)

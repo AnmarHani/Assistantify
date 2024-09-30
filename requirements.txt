@@ -34,3 +34,7 @@ faker
 langdetect
 netifaces
 python-dotenv
+httpx
+openai
+broadlink
+python-multipart

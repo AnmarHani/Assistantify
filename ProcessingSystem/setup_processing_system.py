@@ -9,7 +9,8 @@ import httpx
 import openai
 import requests
 from dotenv import load_dotenv
-from fastapi import Depends, Request
+from fastapi import Depends, Request, File, UploadFile, HTTPException, Form
+from fastapi.responses import FileResponse
 from gtts import gTTS
 from langdetect import detect
 from pydub import AudioSegment
@@ -28,146 +29,159 @@ if TYPE_CHECKING:
     from fastapi import FastAPI
 
 load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-openai = openai.OpenAI(api_key=OPENAI_API_KEY)
+openai = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 async def send_to_gpt(message: str, user, db: Session):
     content = f"""
         Your name is Assistantify (A Personal Assistant System), you are helping {user.username},
+        You will do one of two things, either 1. Answer (Suggestion, Prediction) Based on {user.username}'s data or 2. Action (Reward, Send Action From List)
+        Actions list = [TURN_LIGHTS_ON, TURN_LIGHTS_OFF, REWARD], You can only send a reward action based on {user.username} behaviour on their message, if they did good (Other Answers, or bad actions should be ignored as for rewarding action) based on the data, append to the message you will say You will get rewarded with 1 ATN (which is the Coin for rewards).
         with data: {finance_prompt(user, db)}, {health_prompt(user, db)}, {productivity_prompt(user, db)} in the financial, health, and productivity life domains respectively. 
         Any message will be based on this data, Give them helpful  advices, suggestions, and predictions them based on the message they have sent and their data that is given to you.
     """
     detected_language = detect(message)
 
-    if (
-        "clean" in message.lower()
-        or "تنظيف" in message.lower()
-        or "نظف" in message.lower()
-        or "نظافة" in message.lower()
-    ):
-        async with httpx.AsyncClient() as client:
-            await client.get(f"http://{HOST}:{PORT}/device_on")
-        if detected_language == "ar": 
-            return "ابشر، الان ببدا انظف!"
-        return "Sure! I will start cleaning now."
-
-    if (
-        "back" in message.lower()
-        or "رجوع" in message.lower()
-        or "إرجعي" in message.lower()
-        or "رجع" in message.lower()
-    ):
-        async with httpx.AsyncClient() as client:
-            await client.get(f"http://{HOST}:{PORT}/device_off")
-        if detected_language == "ar": 
-            return "ان شاءالله نكون ادينا الواجب"
-        return "Okay, Turning Off."
-
-    if (
-        "steps" in message.lower()
-        or "achieve" in message.lower()
-        or "apple" in message.lower()
-        or "خطوات" in message.lower()
-        or "خطوة" in message.lower()
-        or "تفاح" in message.lower()
-        or "إنجاز" in message.lower()
-        or "نجزت" in message.lower()
-    ):
-        async with httpx.AsyncClient() as client:
-            await client.post(
-                f"http://{HOST}:{PORT}/reward_user",
-                headers={"Content-Type": "application/json"},
-                data=json.dumps({"account_address": f"{user.blockchain_account}"}),
-            )
-        if (
-            "5,000" in message.lower()
-            or "خمسة" in message.lower()
-            or "خمس" in message.lower()
-        ):
-            if detected_language == "ar": 
-                return "ماشاءالله! إنجاز رِياضي مُمتاز! اكيد هذا الشيء بيحسن من صحتك.... وبعطيك جاظزة عُملة واحدة من ATN"
-            return "Wow! You have Walked 5000 Steps, Here is 1 ATN Coin"
-        elif (
-            "ate" in message.lower()
-            or "eat" in message.lower()
-            or "اكل" in message.lower()
-            or "أكل" in message.lower()
-        ):
-            if detected_language == "ar": 
-                return "اختيار مُوَفِّق، اكْل التفاح يُعتبر شيء جيد لصحتك... وبعطيك جائزة عُملة واحدة من ATN"
-            return "Nice Choice, Eating Apple is Healthy, Here is 1 ATN Coin"
-        else:
-            if detected_language == "ar": 
-                return "انجازات اكثر من رائعة! نبغَى نسمع انجازات اكثر واكثر باذن الله، بعطيك جائزة على هذه الانجازات، عبارة عن عُملة واحدة من ATN"
-            return "Wow! You have Achieved All This, Here is 1 ATN Coin"
-
     session = [
         {"role": "system", "content": content},
         {"role": "user", "content": message},
     ]
-    print(session)
+
     response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[{"role": msg["role"], "content": msg["content"]} for msg in session],
     )
-    return response.choices[0].message.content
+
+    response_text = response.choices[0].message.content
+
+    if "ATN" in response_text:
+        if os.getenv("BLOCKCHAIN_ENV") == "True":
+            async with httpx.AsyncClient() as client:
+                await client.post(
+                    f"http://{HOST}:{PORT}/reward_user",
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps({"account_address": f"{user.blockchain_account}"}),
+                )
+        else:
+            print("Rewarded")
+
+    return response_text
+
+
+async def transcribe_audio(file_path: str):
+    with open(file_path, "rb") as f:
+        response = openai.audio.transcriptions.create(model="whisper-1", file=f)
+    return response.text
+
+
+async def text_to_voice(text: str):
+    tts_response = openai.audio.speech.create(
+        model="tts-1",  # Choose the desired TTS model
+        voice="onyx",  # Choose the voice (e.g., alloy, echo, fable, etc.)
+        input=text,
+    )
+
+    # Save the speech audio into a file
+    tts_response.write_to_file(os.path.join("static", "response.mp3"))
+
+    return True
 
 
 def setup_processing_system(app: "FastAPI"):
-    @app.post("/voice")
-    async def voice(
-        request: Request,
+    @app.post("/vision/")
+    async def vision(
+        message: str = Form(...),
+        file: UploadFile = File(...),
         current_user: str = Depends(get_current_user),
         db: Session = Depends(get_db),
     ):
-        data = await request.json()
-        file = data["file"]
+        # Read the uploaded image file
+        file_bytes = await file.read()
 
-        audio_file = base64.b64decode(file)
-        audio_io = io.BytesIO(audio_file)
-        audio_io.seek(0)
+        # Convert the image to base64
+        base64_image = base64.b64encode(file_bytes).decode("utf-8")
 
-        # I Installed brew install ffmpeg "only" for this project, please work.
-        if os.path.exists("temp.wav"):
-            os.remove("temp.wav")
-        audio = AudioSegment.from_file(audio_io, format="3gp")  # or "caf" for iOS
-        audio.export("temp.wav", format="wav")
+        image_session = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "What’s in this image?"},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"},
+                    },
+                ],
+            },
+        ]
 
-        user: User = db.query(User).filter(User.username == current_user).first()
-
-        with open("temp.wav", "rb") as f:
-            response = openai.audio.transcriptions.create(model="whisper-1", file=f)
-            gpt_message = await send_to_gpt(response.text, user, db)
-
-
-        tts_response = openai.audio.speech.create(
-            model="tts-1",  # Choose the desired TTS model
-            voice="onyx",  # Choose the voice (e.g., alloy, echo, fable, etc.)
-            input=gpt_message,
+        image_response = openai.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": msg["role"], "content": msg["content"]}
+                for msg in image_session
+            ],
         )
 
-        # Save the speech audio into a file
-        tts_response.stream_to_file("response.mp3")
-        
-        with open("response.mp3", "rb") as f:
-            audio_response = base64.b64encode(f.read()).decode(
-                "utf-8"
-            )  # Encode the audio file to base64
+        image_text = image_response.choices[0].message.content
+        combined_message = str(message) + " " + "The Image is: " + image_text
+        user: User = db.query(User).filter(User.username == current_user).first()
+        gpt_response = await send_to_gpt(combined_message, user, db)
+        return gpt_response
 
-        async with httpx.AsyncClient() as client:
-            blockchain_balance = await client.post(
-                f"http://{HOST}:{PORT}/get_account_balance",
-                headers={"Content-Type": "application/json"},
-                data=json.dumps({"account_address": f"{user.blockchain_account}"}),
-            )
+    @app.post("/audio/")
+    async def audio(
+        file: UploadFile = File(...),
+        current_user: str = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ):
+        # Check if audio file is valid
+        if file.content_type not in [
+            "audio/3gp",
+            "audio/caf",
+            "audio/wav",
+            "audio/mpeg",
+            "audio/x-m4a",  # M4A support
+            "audio/mp4",  # Sometimes M4A files have this content type
+        ]:
+            raise HTTPException(status_code=400, detail="Invalid audio format")
 
-        coins = blockchain_balance.text
+        # Read the uploaded file
+        file_bytes = await file.read()
+        audio_io = io.BytesIO(file_bytes)
 
+        # Save the audio as a temporary WAV file
+        audio = AudioSegment.from_file(audio_io)
+        temp_wav_path = "temp.wav"
+        audio.export(temp_wav_path, format="wav")
+
+        # Step 1: Transcribe the audio using Whisper (assume transcribe_audio() is defined)
+        voice_to_text = await transcribe_audio(temp_wav_path)
+
+        user: User = db.query(User).filter(User.username == current_user).first()
+        gpt_response = await send_to_gpt(voice_to_text, user, db)
+
+        await text_to_voice(gpt_response)
+
+        # Remove the temp wav file after processing
+        if os.path.exists(temp_wav_path):
+            os.remove(temp_wav_path)
+
+        if os.getenv("BLOCKCHAIN_ENV") == "True":
+            async with httpx.AsyncClient() as client:
+                blockchain_balance = await client.post(
+                    f"http://{HOST}:{PORT}/get_account_balance",
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps({"account_address": f"{user.blockchain_account}"}),
+                )
+
+            coins = blockchain_balance.text
+        else:
+            coins = 0
+
+        # Step 3: Return the mp3 file path as a response
         return {
-            "response": audio_response,
-            "system_message": gpt_message,
-            "user_message": response.text,
+            "file_path": f"https://atn-api-gateway.onrender.com/code/static/response.mp3",
+            "system_message": gpt_response,
             "coins": coins,
         }
 
@@ -183,13 +197,16 @@ def setup_processing_system(app: "FastAPI"):
         user: User = db.query(User).filter(User.username == current_user).first()
         response = await send_to_gpt(message, user, db)
 
-        async with httpx.AsyncClient() as client:
-            blockchain_balance = await client.post(
-                f"http://{HOST}:{PORT}/get_account_balance",
-                headers={"Content-Type": "application/json"},
-                data=json.dumps({"account_address": f"{user.blockchain_account}"}),
-            )
+        if os.getenv("BLOCKCHAIN_ENV") == "True":
+            async with httpx.AsyncClient() as client:
+                blockchain_balance = await client.post(
+                    f"http://{HOST}:{PORT}/get_account_balance",
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps({"account_address": f"{user.blockchain_account}"}),
+                )
 
-        coins = blockchain_balance.text
+            coins = blockchain_balance.text
+        else:
+            coins = 0
 
         return {"response": response, "coins": coins}
