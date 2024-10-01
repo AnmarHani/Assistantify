@@ -22,7 +22,7 @@ from AnalyticsSystem.prompt_functions import (
     productivity_prompt,
 )
 from utils.authentication_utils import get_current_user
-from utils.constants import HOST, PORT, GPT_MODEL, VOICE_MODEL
+from utils.constants import HOST, PORT, GPT_MODEL, VOICE_MODEL, BASE_URL
 from utils.database_utils import User, get_db
 
 if TYPE_CHECKING:
@@ -58,7 +58,7 @@ async def send_to_gpt(message: str, user, db: Session):
         if os.getenv("BLOCKCHAIN_ENV") == "True":
             async with httpx.AsyncClient() as client:
                 await client.post(
-                    f"http://{HOST}:{PORT}/reward_user",
+                    f"{BASE_URL}/reward_user",
                     headers={"Content-Type": "application/json"},
                     data=json.dumps({"account_address": f"{user.blockchain_account}"}),
                 )
@@ -88,7 +88,22 @@ async def text_to_voice(text: str):
 
 
 def setup_processing_system(app: "FastAPI"):
-    @app.post("/vision/")
+
+    @app.post("/file_upload_test")
+    async def file_upload_test(
+        file: UploadFile = File(...)
+    ):
+
+        file_bytes = await file.read(100)
+        print(file_bytes)
+        
+        with open(os.path.join("static", file.filename), "wb") as f:
+            while chunk := await file.read(1024):  # Read the file in chunks
+                f.write(chunk)
+        
+        return {"message": f"Thank you for testing! The file name is: {file.filename} which can be accessed from: https://atn-api-gateway.onrender.com/code/static/{file.filename}"}
+
+    @app.post("/vision")
     async def vision(
         message: str = Form(...),
         file: UploadFile = File(...),
@@ -133,7 +148,7 @@ def setup_processing_system(app: "FastAPI"):
         if os.getenv("BLOCKCHAIN_ENV") == "True":
             async with httpx.AsyncClient() as client:
                 blockchain_balance = await client.post(
-                    f"http://{HOST}:{PORT}/get_account_balance",
+                    f"{BASE_URL}/get_account_balance",
                     headers={"Content-Type": "application/json"},
                     data=json.dumps({"account_address": f"{user.blockchain_account}"}),
                 )
@@ -144,7 +159,7 @@ def setup_processing_system(app: "FastAPI"):
 
         return {"bot_message": gpt_response, "coins": coins}
 
-    @app.post("/voice/")
+    @app.post("/voice")
     async def voice(
         file: UploadFile = File(...),
         current_user: str = Depends(get_current_user),
@@ -163,6 +178,7 @@ def setup_processing_system(app: "FastAPI"):
 
         # Read the uploaded file
         file_bytes = await file.read()
+
         audio_io = io.BytesIO(file_bytes)
 
         # Save the audio as a temporary WAV file
@@ -185,7 +201,7 @@ def setup_processing_system(app: "FastAPI"):
         if os.getenv("BLOCKCHAIN_ENV") == "True":
             async with httpx.AsyncClient() as client:
                 blockchain_balance = await client.post(
-                    f"http://{HOST}:{PORT}/get_account_balance",
+                    f"{BASE_URL}/get_account_balance",
                     headers={"Content-Type": "application/json"},
                     data=json.dumps({"account_address": f"{user.blockchain_account}"}),
                 )
@@ -217,7 +233,7 @@ def setup_processing_system(app: "FastAPI"):
         if os.getenv("BLOCKCHAIN_ENV") == "True":
             async with httpx.AsyncClient() as client:
                 blockchain_balance = await client.post(
-                    f"http://{HOST}:{PORT}/get_account_balance",
+                    f"{BASE_URL}/get_account_balance",
                     headers={"Content-Type": "application/json"},
                     data=json.dumps({"account_address": f"{user.blockchain_account}"}),
                 )

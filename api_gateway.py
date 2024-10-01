@@ -13,7 +13,7 @@ from IoTSystem.setup_iot_system import setup_iot_system
 
 from utils.fake_data_generator import insert_fake_data
 
-from utils.constants import PORT, HOST
+from utils.constants import PORT, HOST, BASE_URL
 from utils.database_utils import get_db, User
 from utils.authentication_utils import (
     get_password_hash,
@@ -88,7 +88,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     
     if(os.getenv("BLOCKCHAIN_ENV") == "True"):
         blockchain_address = requests.get(
-            f"http://{HOST}:{PORT}/get_new_user_blockchain_account"
+            f"{BASE_URL}/get_new_user_blockchain_account"
         ).text
     else:
         blockchain_address = "0x43eB3A2Af4b2eC285FcaA58Fe912880F3a58154a"
