@@ -31,6 +31,20 @@ if TYPE_CHECKING:
 load_dotenv()
 openai = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+def extract_action(response_text: str, action_id: str):
+    start = response_text.find(f'[{action_id}')
+    end = response_text.find(']', start)
+
+    if start != -1 and end != -1:
+        extracted_str = response_text[start:end+1]
+        
+        cleaned_str = extracted_str.replace(f'[{action_id}, ', '').replace(']', '')
+                
+        entry_parts = [part.strip().strip('"') for part in cleaned_str.split(',')]
+
+        return entry_parts
+    else:
+        return -1
 
 async def send_to_gpt(message: str, user, db: Session):
     content = f"""
@@ -38,7 +52,7 @@ async def send_to_gpt(message: str, user, db: Session):
         You will do one of two things, either 1. Answer (Suggestion, Prediction) Based on {user.username}'s data or 2. Action (Reward, Send Action From List)
         Actions list = [LIGHTS_ON, LIGHTS_OFF, REW_ATN, ADD_STOCK, REM_STOCK], You can only send a reward action based on {user.username} behaviour on their message, if they did good (Other Answers, or bad actions should be ignored as for rewarding action) based on the data, append to the message you will say You will get rewarded with 1 ATN (which is the Coin for rewards).
         Action Description: REW_ATN [REW_ATN, <ATN_VALUE>], ADD_STOCK [ADD_STOCK, <STOCK_NAME>, <STOCK_PRICE>, <STOCK_NUM>].
-        When choosing an action based on user message or automatically, please write the action (e.g. Action Response: [REW_ATN, 1] ) 1  is the value of ATN and say anything, I will use this as an indicator for calling other functions.
+        When choosing an action (you can make multiple actions) based on user message or automatically, please write the action with the same format in the action description [ADD_STOCK, ..entries] or [REW_ATN, ..entries], I will read it from your response and extract the entries.
         with data: {finance_prompt(user, db)}, {health_prompt(user, db)}, {productivity_prompt(user, db)} in the financial, health, and productivity life domains respectively. 
         Any message will be based on this data, Give them helpful  advices, suggestions, and predictions them based on the message they have sent and their data that is given to you.
     """
@@ -68,16 +82,8 @@ async def send_to_gpt(message: str, user, db: Session):
             print("Rewarded")
 
     if "ADD_STOCK" in response_text:
-        # Remove the 'ADD_STOCK [' and ']' parts
-        clean_str = response_text.replace('ADD_STOCK [ADD_STOCK, ', '').replace(']', '')
-
-        # Split by comma and strip spaces
-        stock_name, stock_price, stock_num = [item.strip() for item in clean_str.split(',')]
-
-        # Print the extracted values
-        print(f"Stock Name: {stock_name}")
-        print(f"Stock Price: {stock_price}")
-        print(f"Stock Number: {stock_num}")
+        ACTION_ID = "ADD_STOCK"
+        print(extract_action(response_text, ACTION_ID))
 
     return response_text
 
