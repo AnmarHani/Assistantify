@@ -10,6 +10,7 @@ from ProcessingSystem.setup_processing_system import setup_processing_system
 from RewardingSystem.setup_rewarding_system import setup_rewarding_system
 from AnalyticsSystem.setup_analytics_system import setup_analytics_system
 from IoTSystem.setup_iot_system import setup_iot_system
+from ProfileSystem.setup_profile_system import setup_profile_system
 
 from utils.fake_data_generator import insert_fake_data
 
@@ -25,6 +26,7 @@ from utils.authentication_utils import (
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
 class Message(BaseModel):
     message: str
 
@@ -62,6 +64,7 @@ app.add_middleware(
 if(os.getenv("BLOCKCHAIN_ENV") == "True"): setup_rewarding_system(app)
 setup_processing_system(app)
 setup_analytics_system(app)
+setup_profile_system(app)
 if(os.getenv("IOT_ENV") == "True"): setup_iot_system(app)
 
 from fastapi.staticfiles import StaticFiles
@@ -73,6 +76,7 @@ print("-------WORKING SYSTEMS-------")
 print(f"BLOCKCHAIN SYSTEM: {True if os.getenv('BLOCKCHAIN_ENV') == 'True' else False}")
 print("PROCESSING SYSTEM: True")
 print("ANALYTICS SYSTEM: True")
+print("PROFILE SYSTEM: True")
 print(f"IOT SYSTEM: {True if os.getenv('IOT_ENV') == 'True' else False}")
 print(f"IS DEVELOPMENT?: {True if os.getenv('DEV') == 'True' else False}")
 print("#############################")
@@ -80,7 +84,6 @@ print("#############################")
 @app.get("/")
 async def main():
     return {"message": "Hello World"}
-
 
 @app.post("/register", response_model=Message)
 def register(user: UserCreate, db: Session = Depends(get_db)):

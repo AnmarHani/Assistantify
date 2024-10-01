@@ -36,7 +36,9 @@ async def send_to_gpt(message: str, user, db: Session):
     content = f"""
         Your name is Assistantify (A Personal Assistant System), you are helping {user.username},
         You will do one of two things, either 1. Answer (Suggestion, Prediction) Based on {user.username}'s data or 2. Action (Reward, Send Action From List)
-        Actions list = [TURN_LIGHTS_ON, TURN_LIGHTS_OFF, REWARD], You can only send a reward action based on {user.username} behaviour on their message, if they did good (Other Answers, or bad actions should be ignored as for rewarding action) based on the data, append to the message you will say You will get rewarded with 1 ATN (which is the Coin for rewards).
+        Actions list = [LIGHTS_ON, LIGHTS_OFF, REW_ATN, ADD_STOCK, REM_STOCK], You can only send a reward action based on {user.username} behaviour on their message, if they did good (Other Answers, or bad actions should be ignored as for rewarding action) based on the data, append to the message you will say You will get rewarded with 1 ATN (which is the Coin for rewards).
+        Action Description: REW_ATN [REW_ATN, <ATN_VALUE>], ADD_STOCK [ADD_STOCK, <STOCK_NAME>, <STOCK_PRICE>, <STOCK_NUM>].
+        When choosing an action based on user message or automatically, please write the action (e.g. Action Response: [REW_ATN, 1] ) 1  is the value of ATN and say anything, I will use this as an indicator for calling other functions.
         with data: {finance_prompt(user, db)}, {health_prompt(user, db)}, {productivity_prompt(user, db)} in the financial, health, and productivity life domains respectively. 
         Any message will be based on this data, Give them helpful  advices, suggestions, and predictions them based on the message they have sent and their data that is given to you.
     """
@@ -54,7 +56,7 @@ async def send_to_gpt(message: str, user, db: Session):
 
     response_text = response.choices[0].message.content
 
-    if "ATN" in response_text:
+    if "REW_ATN" in response_text:
         if os.getenv("BLOCKCHAIN_ENV") == "True":
             async with httpx.AsyncClient() as client:
                 await client.post(
@@ -64,6 +66,18 @@ async def send_to_gpt(message: str, user, db: Session):
                 )
         else:
             print("Rewarded")
+
+    if "ADD_STOCK" in response_text:
+        # Remove the 'ADD_STOCK [' and ']' parts
+        clean_str = response_text.replace('ADD_STOCK [ADD_STOCK, ', '').replace(']', '')
+
+        # Split by comma and strip spaces
+        stock_name, stock_price, stock_num = [item.strip() for item in clean_str.split(',')]
+
+        # Print the extracted values
+        print(f"Stock Name: {stock_name}")
+        print(f"Stock Price: {stock_price}")
+        print(f"Stock Number: {stock_num}")
 
     return response_text
 

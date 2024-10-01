@@ -44,7 +44,7 @@ class User(Base):
     finance = relationship("Finance", back_populates="user", uselist=False)
     productivity = relationship("Productivity", back_populates="user", uselist=False)
     blockchain_account = Column(String, unique=False, index=True)
-
+    transactions = relationship("Transaction", back_populates="user")
 
 class Health(Base):
     __tablename__ = "health"
@@ -90,5 +90,16 @@ class Productivity(Base):
     breaks_taken_monthly = Column(Integer)
     user = relationship("User", back_populates="productivity")
 
+class Transaction(Base):
+    __tablename__ = "transactions"
 
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    transaction_amount = Column(Float, nullable=False)
+    transaction_type = Column(String, nullable=False)  # E.g., 'income', 'expense'
+    transaction_reason = Column(String, nullable=True)  # E.g., 'grocery', 'salary'
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="transactions")
+    
 Base.metadata.create_all(bind=engine)
