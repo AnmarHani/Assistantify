@@ -37,10 +37,11 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    age = Column(Integer)
-    country = Column(String)
+    age = Column(Integer, nullable=True)
+    country = Column(String, nullable=True)
+    career = Column(String, nullable=True)  
+    habit = Column(String, nullable=True)   
     health = relationship("Health", back_populates="user", uselist=False)
-
     finance = relationship("Finance", back_populates="user", uselist=False)
     productivity = relationship("Productivity", back_populates="user", uselist=False)
     blockchain_account = Column(String, unique=False, index=True)
@@ -51,11 +52,19 @@ class Health(Base):
 
     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
     allergies = Column(String)
+    timestamp = Column(DateTime, default=datetime.utcnow)
     daily_calorie = Column(Integer)
     fav_food = Column(String)
     weight = Column(Integer)
     medical_conditions = Column(String)
     avg_heart_beat = Column(Integer)
+    exercise_routine = Column(String, nullable=True)
+    rest_days = Column(Integer, nullable=True)
+    daily_steps = Column(Integer, nullable=True)
+    workout_hours = Column(Float, nullable=True)
+    diet_choices = Column(String, nullable=True)
+    stress_quality = Column(String, nullable=True)
+    height = Column(Integer, nullable=True)
 
     user = relationship("User", back_populates="health")
 
@@ -90,6 +99,7 @@ class Productivity(Base):
     breaks_taken_monthly = Column(Integer)
     user = relationship("User", back_populates="productivity")
 
+
 class Transaction(Base):
     __tablename__ = "transactions"
 
@@ -101,5 +111,6 @@ class Transaction(Base):
     timestamp = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="transactions")
-    
+
+
 Base.metadata.create_all(bind=engine)
