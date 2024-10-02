@@ -11,29 +11,29 @@ Assistantify is an innovative AI-powered personal assistant product designed to 
 ![Screenshot 2024-05-16 at 11 50 22 AM](https://github.com/AnmarHani/Assistantify/assets/76432762/38015855-cf09-4d26-b0e0-3353377359fc)
 
 ## Technologies Used
-Stacks and Choices
+### Stacks and Choices
 As mentioned before, we use client-server architecture, so we have frontend, backend, IoT, blockchain, etc.
 
-Frontend
+### Frontend
 -	FlutterFlow as a Dropdown Framework.
 -	Flutter Framework for programming mobile frontend applications.
 -	Dart as a Programming Language.
-Backend
+### Backend
 -	Python as a programming language.
 -	FastAPI as a backend framework.
-IoT
+### IoT
 -	Broadlink Library.
 -	ESP8266 Microcontroller with C++ (Arduino Libraries).
-Blockchain
+### Blockchain
 -	Solidity as a programming language.
 -	Etherium as a blockchain network.
 -	Truffle and Ganache as a blockchain server/service.
-Testing
+### Testing
 -	Postman for API Testing.
 -	Pytest for Python Unit Testing
 -	FlutterFlow Automated Testing for Frontend Testing.
 -	Locust for Performance Testing.
-Other and Third Party
+### Other and Third Party
 -	Docker for containerization
 -	GPT Model for AI Processing (Chat, Image).
 -	Whisper Model for Natural Language Processing.
