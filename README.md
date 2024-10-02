@@ -46,8 +46,8 @@ As mentioned before, we use client-server architecture, so we have frontend, bac
 - Assistantify Website Portofolio
 - Assistantify Mobile Application
 - [Assistantify UI/UX Design](https://www.figma.com/design/8URmvkc1i4al4VVC1VRi77/M%26A?node-id=633-3262&t=RPuHQ154oMqLt1LM-1)
-- Assistantify API Docker Image
+- [Assistantify API Docker Image](https://hub.docker.com/repository/docker/anmarhani/atn_api_gateway/general)
 - Assistantify Presentation Slides
-- Assistantify Application Survey
+- [Assistantify Application Survey](https://forms.gle/4HGKcA39EcpDMyUr8)
 - Assistantify Usability Survey
 - Assistantify Demos
