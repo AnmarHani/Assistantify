@@ -1,5 +1,6 @@
-![image](https://github.com/user-attachments/assets/8e35794d-718c-4f03-a810-ebd17504c1d2)# Assistantify 
+![Logo](https://github.com/user-attachments/assets/3c4f5824-80d3-4e84-a495-20bd83640650)
 
+# Assistantify 
 Assistantify is an innovative AI-powered personal assistant product designed to provide highly personalized assistance and lifestyle management. It stands out by offering a unique blend of features that cater to individual preferences and needs across various domains such as health, finance, fitness, and productivity. By integrating with a user's digital ecosystem, Assistantify aims to deliver actionable insights and recommendations that are tailored to each user's life. Assistantify is not only a “mobile app” it is a middleware that connects apps or devices with the user but in a smart “AI” personalized way. Leveraging new tech trends such as AI, Big Data, Cloud, IoT, Blockchain, AR/VR, etc.
 
 ## Team
