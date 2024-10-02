@@ -78,8 +78,7 @@ async def authorize():
 
 @app.get("/logout", name="logout")
 async def logout(request: Request):
-    """Handle logout logic here (e.g., clear session or token)."""
-    session.clear()
+    # Handle logout logic here (e.g., clear session or token)
     return {"message": "Logged out successfully"}
 
 
@@ -108,31 +107,6 @@ async def callback(request: Request):
     session['credentials'] = credentials_to_dict(credentials)
 
     return RedirectResponse(url='/fit_data')
-
-
-def get_credentials():
-    """Retrieve credentials from session."""
-    if 'credentials' not in session:
-        raise HTTPException(
-            status_code=401, detail="Unauthorized. Please authorize.")
-    return Credentials(**session['credentials'])
-
-
-def fetch_fit_data(data_source):
-    """Fetch data from Google Fit API."""
-    credentials = get_credentials()
-    headers = {'Authorization': f'Bearer {credentials.token}'}
-
-    now = int(time.time() * 1e9)
-    all_the_time = 0  # Get all data
-
-    response = requests.get(
-        f'https://www.googleapis.com/fitness/v1/users/me/dataSources/{data_source}/datasets/{int(all_the_time)}-{int(now)}',
-        headers=headers
-    )
-    return response
-
-# Individual endpoints for each data type
 
 
 @app.get("/fit_data", response_class=HTMLResponse)
@@ -183,11 +157,9 @@ async def get_user_fit_data(request: Request):
 
     # Check for success and extract data
     if all(response.status_code == 200 for response in responses.values()):
-        user_info = requests.get(
-            'https://www.googleapis.com/userinfo/v2/me', headers=headers)
-        user_info = user_info.json()
         weight_data = responses['weight'].json().get('point', [])
         height_data = responses['height'].json().get('point', [])
+
         active_minutes_data = responses['active_minutes'].json()
         activity_segment_data = responses['activity_segment'].json()
         bmr_calories_data = responses['bmr_calories'].json()
@@ -210,7 +182,6 @@ async def get_user_fit_data(request: Request):
 
         fit_data = {
             "request": request,
-            "User Info": user_info,
             "Weight": weight_data,
             "Height": height_data,
             "Active Minutes": active_minutes_data,
@@ -240,201 +211,118 @@ async def get_user_fit_data(request: Request):
         })
 
 
-@app.get("/fit_data/userinfo")
-async def get_user_info(request: Request):
-    """Fetch user info from Google API."""
-    credentials = get_credentials()
-    headers = {'Authorization': f'Bearer {credentials.token}'}
-
-    response = requests.get(
-        'https://www.googleapis.com/userinfo/v2/me',
-        headers=headers
-    )
-    return handle_response(response)
-
-
-@app.get("/fit_data/weight")
-async def get_weight(request: Request):
-    """Fetch user's weight data."""
-    response = fetch_fit_data(
-        'derived:com.google.weight:com.google.android.gms:merge_weight')
-    return handle_response(response)
-
-
-@app.get("/fit_data/height")
-async def get_height(request: Request):
-    """Fetch user's height data."""
-    response = fetch_fit_data(
-        'derived:com.google.height:com.google.android.gms:merge_height')
-    return handle_response(response)
-
-
-@app.get("/fit_data/active_minutes")
-async def get_active_minutes(request: Request):
-    """Fetch user's active minutes data."""
-    response = fetch_fit_data(
-        'derived:com.google.active_minutes:com.google.android.gms:merge_active_minutes')
-    return handle_response(response)
-
-
-@app.get("/fit_data/activity_segment")
-async def get_activity_segment(request: Request):
-    """Fetch user's activity segment data."""
-    response = fetch_fit_data(
-        'derived:com.google.activity.segment:com.google.android.gms:merge_activity_segments')
-    return handle_response(response)
-
-
-@app.get("/fit_data/bmr_calories")
-async def get_bmr_calories(request: Request):
-    """Fetch user's BMR calories data."""
-    response = fetch_fit_data(
-        'derived:com.google.calories.bmr:com.google.android.gms:merged')
-    return handle_response(response)
-
-
-@app.get("/fit_data/expended_calories")
-async def get_expended_calories(request: Request):
-    """Fetch user's expended calories data."""
-    response = fetch_fit_data(
-        'derived:com.google.calories.expended:com.google.android.gms:merge_calories_expended')
-    return handle_response(response)
-
-
-@app.get("/fit_data/step_count")
-async def get_step_count(request: Request):
-    """Fetch user's step count data."""
-    response = fetch_fit_data(
-        'derived:com.google.step_count.delta:com.google.android.gms:merge_step_deltas')
-    return handle_response(response)
-
-
-@app.get("/fit_data/distance")
-async def get_distance(request: Request):
-    """Fetch user's distance data."""
-    response = fetch_fit_data(
-        'derived:com.google.distance.delta:com.google.android.gms:merge_distance_delta')
-    return handle_response(response)
-
-
-@app.get("/fit_data/heart_minutes")
-async def get_heart_minutes(request: Request):
-    """Fetch user's heart minutes data."""
-    response = fetch_fit_data(
-        'raw:com.google.heart_minutes:com.google.android.apps.fitness:user_input')
-    return handle_response(response)
-
-
-@app.get("/fit_data/speed")
-async def get_speed(request: Request):
-    """Fetch user's speed data."""
-    response = fetch_fit_data(
-        'derived:com.google.speed:com.google.android.gms:merge_speed')
-    return handle_response(response)
-
-
-@app.get("/fit_data/heart_rate")
-async def get_heart_rate(request: Request):
-    """Fetch user's heart rate data."""
-    response = fetch_fit_data(
-        'derived:com.google.heart_rate.bpm:com.google.android.gms:merge_heart_rate_bpm')
-    return handle_response(response)
-
-
-@app.get("/fit_data/oxygen_saturation")
-async def get_oxygen_saturation(request: Request):
-    """Fetch user's oxygen saturation data."""
-    response = fetch_fit_data(
-        'derived:com.google.oxygen_saturation:com.google.android.gms:merge_oxygen_saturation')
-    return handle_response(response)
-
-
-@app.get("/fit_data/blood_glucose")
-async def get_blood_glucose(request: Request):
-    """Fetch user's blood glucose data."""
-    response = fetch_fit_data(
-        'derived:com.google.blood_glucose:com.google.android.gms:merge_blood_glucose')
-    return handle_response(response)
-
-
-@app.get("/fit_data/blood_pressure")
-async def get_blood_pressure(request: Request):
-    """Fetch user's blood pressure data."""
-    response = fetch_fit_data(
-        'derived:com.google.blood_pressure:com.google.android.gms:merge_blood_pressure')
-    return handle_response(response)
-
-
-@app.get("/fit_data/body_temperature")
-async def get_body_temperature(request: Request):
-    """Fetch user's body temperature data."""
-    response = fetch_fit_data(
-        'derived:com.google.body_temperature:com.google.android.gms:merge_body_temperature')
-    return handle_response(response)
-
-
-@app.get("/fit_data/reproductive_health")
-async def get_reproductive_health(request: Request):
-    """Fetch user's reproductive health data."""
-    response = fetch_fit_data(
-        'derived:com.google.reproductive_health:com.google.android.gms:merge_reproductive_health')
-    return handle_response(response)
-
-
-@app.get("/fit_data/sleep")
-async def get_sleep(request: Request):
-    """Fetch user's sleep data."""
-    response = fetch_fit_data(
-        'derived:com.google.sleep:com.google.android.gms:merge_sleep')
-    return handle_response(response)
-
-
-@app.get("/fit_data/nutrition")
-async def get_nutrition(request: Request):
-    """Fetch user's nutrition data."""
-    response = fetch_fit_data(
-        'derived:com.google.nutrition:com.google.android.gms:merge_nutrition')
-    return handle_response(response)
-
-
-@app.get("/fit_data/location")
-async def get_location(request: Request):
-    """Fetch user's location data."""
-    response = fetch_fit_data(
-        'derived:com.google.location:com.google.android.gms:merge_location')
-    return handle_response(response)
-
-
-@app.get("/fit_data/workout")
-async def get_workout(request: Request):
-    """Fetch user's workout data."""
-    response = fetch_fit_data(
-        'derived:com.google.activity.segment:com.google.android.gms:merge_activity_segments')
-    return handle_response(response)
-
-
-def handle_response(response):
-    """Handle the response from Google Fit API."""
-    if response.status_code == 200:
-        return response.json()
-    else:
-        raise HTTPException(status_code=response.status_code,
-                            detail=response.json())
-
-
 def credentials_to_dict(credentials):
-    """Convert credentials to a dictionary."""
     return {
-        'token': credentials.token,
-        'refresh_token': credentials.refresh_token,
-        'token_uri': credentials.token_uri,
-        'client_id': credentials.client_id,
-        'client_secret': credentials.client_secret,
-        'scopes': credentials.scopes
+        "token": credentials.token,
+        "refresh_token": credentials.refresh_token,
+        "token_uri": credentials.token_uri,
+        "client_id": credentials.client_id,
+        "client_secret": credentials.client_secret,
+        "scopes": credentials.scopes
     }
 
 
-# Run the application
+def extract_weight_and_height(weight_data, height_data):
+    """Extract weight and height from Google Fit data."""
+    weight_data = weight_data[-1].get('value', [{}])
+    height_data = height_data[-1].get('value', [{}])
+
+    weight_value = weight_data[-1].get('fpVal', 0) if weight_data else 0
+    height_value = height_data[-1].get('fpVal', 0) if height_data else 0
+
+    return weight_value, height_value
+
+
+def extract_active_minutes(response):
+    # Check if response is a list and has points
+    if isinstance(response, list) and response:
+        return response[-1].get('value', {}).get('intVal', 0)
+    return 0
+
+
+def extract_activity_segment(response):
+    # Check if response is a list and has points
+    if isinstance(response, list) and response:
+        # Access the last point in the list
+        last_segment = response[-1].get('point', [{}])
+        if last_segment:
+            return last_segment[-1].get('value', {}).get('intVal', 0)
+    return 0
+
+
+def extract_bmr_calories(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('intVal', 0)
+    return 0
+
+
+def extract_step_count(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('intVal', 0)
+    return 0
+
+
+def extract_distance(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('fpVal', 0)
+    return 0
+
+
+def extract_heart_minutes(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('intVal', 0)
+    return 0
+
+
+def extract_speed(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('fpVal', 0)
+    return 0
+
+
+def extract_heart_rate(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('fpVal', 0)
+    return 0
+
+
+def extract_oxygen_saturation(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('fpVal', 0)
+    return 0
+
+
+def extract_body_temperature(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('fpVal', 0)
+    return 0
+
+
+def extract_blood_pressure(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('value', {}).get('fpVal', 0)
+    return 0
+
+
+def extract_blood_glucose(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('value', {}).get('fpVal', 0)
+    return 0
+
+
+def extract_sleep(response):
+    print(response)
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('intVal', 0)
+    return 0
+
+
+def extract_nutrition(response):
+    if isinstance(response, list) and response:
+        return response[-1].get('point', [{}])[-1].get('value', {}).get('intVal', 0)
+    return 0
+
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="localhost", port=8000)

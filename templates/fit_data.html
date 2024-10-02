@@ -65,13 +65,26 @@
             </tr>
         </thead>
         <tbody>
+            {% if fit_data %}
             {% for key, value in fit_data.items() %}
             <tr>
                 <td>{{ key }}</td>
-                <td>{{ value }}</td>
+                <td>
+                    {% if value %}
+                    {{ value }}
+                    {% else %}
+                    No data available
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="2">No data available</td>
+            </tr>
+            {% endif %}
         </tbody>
+
     </table>
     <a href="{{ url_for('logout') }}">Logout</a>
 </body>
