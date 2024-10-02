@@ -15,9 +15,62 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 # Update with your redirect URI if needed
 REDIRECT_URI = 'http://localhost:8000/callback'
 SCOPES = [
+    # Basic user information scopes
+    'openid',
+    # See your primary Google Account email address
+    'https://www.googleapis.com/auth/userinfo.email',
+    # See your personal info, including any publicly available personal info
+    'https://www.googleapis.com/auth/userinfo.profile',
+
+
+    # Fitness API scopes for write access
+    # Add to your Google Fit physical activity data
+    'https://www.googleapis.com/auth/fitness.activity.write',
+    # Add info about your blood glucose to Google Fit
+    'https://www.googleapis.com/auth/fitness.blood_glucose.write',
+    # Add info about your blood pressure in Google Fit
+    'https://www.googleapis.com/auth/fitness.blood_pressure.write',
+    # Add info about your body measurements to Google Fit
+    'https://www.googleapis.com/auth/fitness.body.write',
+    # Add to your heart rate data in Google Fit
+    'https://www.googleapis.com/auth/fitness.heart_rate.write',
+    # Add to info about your body temperature in Google Fit
+    'https://www.googleapis.com/auth/fitness.body_temperature.write',
+    # Add to your Google Fit location data
+    'https://www.googleapis.com/auth/fitness.location.write',
+    # Add to info about your nutrition in Google Fit
+    'https://www.googleapis.com/auth/fitness.nutrition.write',
+    # Add info about your oxygen saturation in Google Fit
+    'https://www.googleapis.com/auth/fitness.oxygen_saturation.write',
+    # Add info about your reproductive health in Google Fit
+    'https://www.googleapis.com/auth/fitness.reproductive_health.write',
+    # Add to your sleep data in Google Fit
+    'https://www.googleapis.com/auth/fitness.sleep.write',
+
+
+    # Fitness API scopes for read access
+    # See and store your physical activity data
     'https://www.googleapis.com/auth/fitness.activity.read',
+    # See info about your blood glucose in Google Fit
+    'https://www.googleapis.com/auth/fitness.blood_glucose.read',
+    # See info about your blood pressure in Google Fit
+    'https://www.googleapis.com/auth/fitness.blood_pressure.read',
+    # See info about your body measurements in Google Fit
     'https://www.googleapis.com/auth/fitness.body.read',
-    'https://www.googleapis.com/auth/fitness.location.read'
+    # See your heart rate data in Google Fit
+    'https://www.googleapis.com/auth/fitness.heart_rate.read',
+    # See info about your body temperature in Google Fit
+    'https://www.googleapis.com/auth/fitness.body_temperature.read',
+    # See your Google Fit speed and distance data
+    'https://www.googleapis.com/auth/fitness.location.read',
+    # See info about your nutrition in Google Fit
+    'https://www.googleapis.com/auth/fitness.nutrition.read',
+    # See info about your oxygen saturation in Google Fit
+    'https://www.googleapis.com/auth/fitness.oxygen_saturation.read',
+    # See info about your reproductive health in Google Fit
+    'https://www.googleapis.com/auth/fitness.reproductive_health.read',
+    # See your sleep data in Google Fit
+    'https://www.googleapis.com/auth/fitness.sleep.read'
 ]
 
 
