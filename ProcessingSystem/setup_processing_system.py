@@ -7,12 +7,12 @@ from typing import TYPE_CHECKING
 
 import httpx
 import openai
-import requests
 from dotenv import load_dotenv
 from fastapi import Depends, Request, File, UploadFile, HTTPException, Form
-from fastapi.responses import FileResponse
-from gtts import gTTS
-from langdetect import detect
+# from fastapi.responses import FileResponse
+# import requests
+# from gtts import gTTS
+# from langdetect import detect
 from pydub import AudioSegment
 from sqlalchemy.orm import Session
 
@@ -22,7 +22,7 @@ from AnalyticsSystem.prompt_functions import (
     productivity_prompt,
 )
 from utils.authentication_utils import get_current_user
-from utils.constants import HOST, PORT, GPT_MODEL, VOICE_MODEL, BASE_URL
+from utils.constants import GPT_MODEL, VOICE_MODEL, BASE_URL
 from utils.database_utils import User, get_db
 
 if TYPE_CHECKING:
@@ -56,7 +56,7 @@ async def send_to_gpt(message: str, user, db: Session):
         with data: {finance_prompt(user, db)}, {health_prompt(user, db)}, {productivity_prompt(user, db)} in the financial, health, and productivity life domains respectively. 
         Any message will be based on this data, Give them helpful  advices, suggestions, and predictions them based on the message they have sent and their data that is given to you.
     """
-    detected_language = detect(message)
+    # detected_language = detect(message)
 
     session = [
         {"role": "system", "content": content},
@@ -135,9 +135,6 @@ def setup_processing_system(app: "FastAPI"):
 
         # Convert the image to base64
         base64_image = base64.b64encode(file_bytes).decode("utf-8")
-
-        # docker tag atn_api_gateway anmarhani/atn_api_gateway
-        # docker push anmarhani/atn_api_gateway
 
         image_session = [
             {
