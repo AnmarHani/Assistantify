@@ -1,6 +1,6 @@
 # Assistantify 
 
-Assistantify is an innovative AI-powered personal assistant product designed to provide highly personalized assistance and lifestyle management. It stands out by offering a unique blend of features that cater to individual preferences and needs across various domains such as health, finance, fitness, and productivity. By integrating with a user's digital ecosystem, Assistantify aims to deliver actionable insights and recommendations that are tailored to each user's life. Assistantify is not only a “mobile app” it is a middleware that connects apps or devices with the user but in a smart “AI” personalized way. Leveraging new tech trends such as AI, Big Data, Cloud, IoT, Blockchain, AR/VR, etc.![image](https://github.com/user-attachments/assets/23b94597-1906-4310-b606-746c0070fee4)
+Assistantify is an innovative AI-powered personal assistant product designed to provide highly personalized assistance and lifestyle management. It stands out by offering a unique blend of features that cater to individual preferences and needs across various domains such as health, finance, fitness, and productivity. By integrating with a user's digital ecosystem, Assistantify aims to deliver actionable insights and recommendations that are tailored to each user's life. Assistantify is not only a “mobile app” it is a middleware that connects apps or devices with the user but in a smart “AI” personalized way. Leveraging new tech trends such as AI, Big Data, Cloud, IoT, Blockchain, AR/VR, etc.
 
 ## Overall Idea
 
@@ -45,7 +45,7 @@ As mentioned before, we use client-server architecture, so we have frontend, bac
 - Assistantify Report Document
 - Assistantify Website Portofolio
 - Assistantify Mobile Application
-- Assistantify UI/UX Design
+- [Assistantify UI/UX Design](https://www.figma.com/design/8URmvkc1i4al4VVC1VRi77/M%26A?node-id=633-3262&t=RPuHQ154oMqLt1LM-1)
 - Assistantify API Docker Image
 - Assistantify Presentation Slides
 - Assistantify Application Survey
