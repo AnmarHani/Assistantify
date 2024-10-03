@@ -5,3 +5,6 @@ response.mp3
 temp.wav
 package-lock.json
 .env
+.venv
+.vscode
+client_secrets.json

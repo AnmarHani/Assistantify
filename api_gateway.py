@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import Body, Depends, FastAPI, HTTPException
+from fastapi import Body, Depends, FastAPI, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -22,6 +22,7 @@ from utils.authentication_utils import (
     authenticate_user,
     create_access_token,
 )
+from utils.google_utils import get_googlefit_data_as_string
 
 import os
 from dotenv import load_dotenv
@@ -128,6 +129,17 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 
+
+@app.get("/googlefit")
+def get_googlefit_data(       
+    request: Request,
+    current_user: str = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    google_token = request.headers.get('appAuthorization')
+    user: User = db.query(User).filter(User.username == current_user).first()
+    
+    return get_googlefit_data_as_string(google_token)
 
 if __name__ == "__main__":
     uvicorn.run("api_gateway:app", port=PORT, host=HOST, reload=True if os.getenv('DEV') == "True" else False)
