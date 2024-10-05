@@ -30,11 +30,9 @@ SCOPES = [
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
     'https://www.googleapis.com/auth/fitness.body.read',
-    'https://www.googleapis.com/auth/fitness.body.write',
     'https://www.googleapis.com/auth/fitness.activity.read',
-    'https://www.googleapis.com/auth/fitness.activity.write',
     'https://www.googleapis.com/auth/fitness.heart_rate.read',
-    'https://www.googleapis.com/auth/fitness.heart_rate.write'
+    'https://www.googleapis.com/auth/fitness.location.read',
 ]
 
 # In-memory session for demonstration; use a proper session management system in production
@@ -77,7 +75,7 @@ async def callback(request: Request):
 
     credentials = flow.credentials
     session['credentials'] = credentials_to_dict(credentials)
-    return RedirectResponse(url='/fit_data')
+    return RedirectResponse(url='/fit_data_as_string')
 
 
 def get_credentials():
@@ -103,45 +101,6 @@ def fetch_fit_data(data_source):
     return response
 
 
-@app.get("/fit_data", response_class=HTMLResponse)
-async def get_user_fit_data(request: Request):
-    """Fetch and display user fitness data."""
-    if 'credentials' not in session:
-        return RedirectResponse(url='/authorize')
-
-    credentials = Credentials(**session['credentials'])
-    headers = {'Authorization': f'Bearer {credentials.token}'}
-
-    now = int(time.time() * 1e9)
-    all_the_time = 0  # Get all data
-
-    # Data sources used to fetch the data from Google Fit API
-    data_sources = {
-        'weight': 'derived:com.google.weight:com.google.android.gms:merge_weight',
-        'height': 'derived:com.google.height:com.google.android.gms:merge_height',
-        'bmr_calories': 'derived:com.google.calories.bmr:com.google.android.gms:merged',
-        'step_count': 'derived:com.google.step_count.delta:com.google.android.gms:merge_step_deltas',
-        'distance': 'derived:com.google.distance.delta:com.google.android.gms:merge_distance_delta',
-        'heart_rate': 'derived:com.google.heart_rate.bpm:com.google.android.gms:merge_heart_rate_bpm',
-    }
-
-    print(get_fit_data_as_string())
-
-    # Fetch each dataset
-    responses = {}
-    for key, data_source in data_sources.items():
-        response = requests.get(
-            f'https://www.googleapis.com/fitness/v1/users/me/dataSources/{data_source}/datasets/{int(all_the_time)}-{int(now)}',
-            headers=headers
-        )
-        responses[key] = response
-    # Check for success and extract data
-    if all(response.status_code == 200 for response in responses.values()):
-        fit_data = {key: response.json().get('point', [])
-                    for key, response in responses.items()}
-        return fit_data
-
-
 def handle_response(response):
     """Handle the response from Google Fit API."""
     if response.status_code == 200:
@@ -164,8 +123,13 @@ def credentials_to_dict(credentials):
     }
 
 
+# endpoint for now.
+@app.get("/fit_data_as_string", response_class=HTMLResponse)
 def get_fit_data_as_string():
     """Fetch user fitness data and return as string."""
+    if 'credentials' not in session:
+        return RedirectResponse(url='/authorize')
+
     data_sources = {
         'weight': 'derived:com.google.weight:com.google.android.gms:merge_weight',
         'height': 'derived:com.google.height:com.google.android.gms:merge_height',
