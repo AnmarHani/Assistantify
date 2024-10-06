@@ -1,13 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException, Request, status
-from fastapi.responses import RedirectResponse, HTMLResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
-from google_auth_oauthlib.flow import Flow
-from google.oauth2.credentials import Credentials
-import os
 import requests
 import time
-
 
 
 def fetch_fit_data(data_source, access_token):
@@ -26,7 +18,7 @@ def fetch_fit_data(data_source, access_token):
 
 def get_fit_data_as_string(access_token):
     """Fetch user fitness data and return as string."""
-    
+
     data_sources = {
         'weight': 'derived:com.google.weight:com.google.android.gms:merge_weight',
         'height': 'derived:com.google.height:com.google.android.gms:merge_height',
@@ -65,3 +57,6 @@ Step Count: {fit_data['step_count']}
 Distance: {fit_data['distance']}
 Heart Rate: {fit_data['heart_rate']}
 """
+
+
+print(get_fit_data_as_string('ya29.a0AcM612y1AXUTJkmUVCWl0exGyV8E2GMqAwd7BVPQuxUAfF_72MiWE-J10zjTysMSSLm2gVIo5fju8czRWaQB8Nrk8XnCyrraMRrLJq5i3nv2oesF-QDFHQL236eiemFrNodddTArnENUoLXyGEkERjxzyOiSompSJVzB8lvdaCgYKAcoSARASFQHGX2MiddjF3QwqnttUnsAr_lLAoA0175'))
