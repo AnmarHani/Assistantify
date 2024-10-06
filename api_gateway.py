@@ -22,7 +22,7 @@ from utils.authentication_utils import (
     authenticate_user,
     create_access_token,
 )
-from utils.google_utils import get_googlefit_data_as_string
+from utils.google_utils import get_fit_data_as_string
 
 import os
 from dotenv import load_dotenv
@@ -139,7 +139,7 @@ def get_googlefit_data(
     google_token = request.headers.get('appAuthorization')
     user: User = db.query(User).filter(User.username == current_user).first()
     
-    return get_googlefit_data_as_string(google_token)
+    return get_fit_data_as_string(google_token)
 
 if __name__ == "__main__":
     uvicorn.run("api_gateway:app", port=PORT, host=HOST, reload=True if os.getenv('DEV') == "True" else False)

@@ -57,6 +57,3 @@ Step Count: {fit_data['step_count']}
 Distance: {fit_data['distance']}
 Heart Rate: {fit_data['heart_rate']}
 """
-
-
-print(get_fit_data_as_string('ya29.a0AcM612y1AXUTJkmUVCWl0exGyV8E2GMqAwd7BVPQuxUAfF_72MiWE-J10zjTysMSSLm2gVIo5fju8czRWaQB8Nrk8XnCyrraMRrLJq5i3nv2oesF-QDFHQL236eiemFrNodddTArnENUoLXyGEkERjxzyOiSompSJVzB8lvdaCgYKAcoSARASFQHGX2MiddjF3QwqnttUnsAr_lLAoA0175'))

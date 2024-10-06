@@ -40,7 +40,4 @@ broadlink
 python-multipart
 locust
 paho-mqtt
-google-auth-oauthlib
-# google-auth-httplib2
-# google-auth
 google
