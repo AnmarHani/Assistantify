@@ -4,6 +4,7 @@ import time
 import broadlink
 import paho.mqtt.client as paho
 from paho import mqtt
+import ssl
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
@@ -56,7 +57,8 @@ if is_IOT_enabled:
     client.on_connect = on_connect
 
     # enable TLS for secure connection
-    client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
+    # client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
+    client.tls_set(tls_version=ssl.PROTOCOL_TLS)
     # set username and password
     client.username_pw_set("ATN_IOT_SYSTEM", "Wasd1234")
     # connect to HiveMQ Cloud on port 8883 (default for MQTT)
