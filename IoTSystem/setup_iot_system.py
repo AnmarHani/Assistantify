@@ -45,6 +45,7 @@ if is_broadlink_enabled:
 
 
 if is_IOT_enabled:
+    print("OK?")
     # setting callbacks for different events to see if it works, print the message etc.
     def on_connect(client, userdata, flags, rc, properties=None):
         print("CONNACK received with code %s." % rc)
@@ -81,11 +82,13 @@ def setup_iot_system(app: "FastAPI"):
     if is_IOT_enabled:
         @app.get("/LED_ON")
         def turn_LED_ON():
-            client.publish("ATN/led", payload="ON", qos=0)
+            client.publish("ATN/led", payload="ON", qos=1)
+            return "Sent!"
             
         @app.get("/LED_OFF")
         def turn_LED_ON():
-            client.publish("ATN/led", payload="OFF", qos=0)
+            client.publish("ATN/led", payload="OFF", qos=1)
+            return "Sent!"
 
 
 
