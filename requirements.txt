@@ -41,3 +41,5 @@ python-multipart
 locust
 paho-mqtt
 google
+sqlitecloud
+sqlalchemy-sqlitecloud

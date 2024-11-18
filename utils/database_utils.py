@@ -10,12 +10,17 @@ from sqlalchemy import (
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, Session
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 
 
 # Database setup
-SQLALCHEMY_DATABASE_URL = "sqlite:///./assistantify.db"
+
+SQLALCHEMY_DATABASE_URL = os.getenv("DB_URL")
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
