@@ -79,7 +79,7 @@ def setup_rewarding_system(app: "FastAPI"):
         )
 
         # Send the transaction
-        web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        web3.eth.send_raw_transaction(signed_txn.raw_transaction)
 
         return "Rewarded the User!"
 

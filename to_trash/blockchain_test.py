@@ -30,7 +30,7 @@ transaction = contract.functions.transfer(recipient, value).build_transaction({
 signed_txn = web3.eth.account.sign_transaction(transaction, private_key)
 
 # Send the transaction
-txn_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
+txn_hash = web3.eth.send_raw_transaction(signed_txn.raw_transaction)
 
 print(f'Transaction hash: {txn_hash.hex()}')
 

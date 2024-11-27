@@ -76,7 +76,7 @@ module.exports = {
       provider: () => new HDWalletProvider({
         url: "https://atn-reward-system.onrender.com",
         privateKeys: [
-          "0xe1d84e821221b8deab74c480a83a71c7fda0e4e0c4d11a592a7704311ad64126"
+          "0x755ff5e92b76e72f4981f45bb1f51969966ebbaa8d9fcf69b9c0523399d267d5"
         ],
         providerOrUrl: "https://atn-reward-system.onrender.com",
       }),
@@ -154,3 +154,5 @@ module.exports = {
   //   }
   // }
 };
+
+
