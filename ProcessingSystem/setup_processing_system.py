@@ -81,6 +81,26 @@ async def send_to_gpt(message: str, user, db: Session):
         else:
             add_fake_coins()
 
+    if "LIGHTS_ON" in response_text:
+        if os.getenv("IOT_ENV") == "True":
+            async with httpx.AsyncClient() as client:
+                await client.get(
+                    f"{BASE_URL}/LED_ON",
+                    headers={"Content-Type": "application/json"},
+                )
+        else:
+            response_text += "IoT Service Disabled"
+
+    if "LIGHTS_OFF" in response_text:
+        if os.getenv("IOT_ENV") == "True":
+            async with httpx.AsyncClient() as client:
+                await client.get(
+                    f"{BASE_URL}/LED_OFF",
+                    headers={"Content-Type": "application/json"},
+                )
+        else:
+            response_text += "IoT Service Disabled"
+
     if "ADD_STOCK" in response_text:
         ACTION_ID = "ADD_STOCK"
         print(extract_action(response_text, ACTION_ID))
