@@ -9,8 +9,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from utils.authentication_utils import get_current_user
 from utils.constants import BASE_URL
-from utils.database_utils import Finance, Health, Productivity, User, get_db
-from utils.database_utils import get_db, Transaction, User
+from utils.database_utils import Finance, Health, Productivity, User, Transaction, get_db, get_fake_coins
 
 class ChartResponse(BaseModel):
     x: list[int]  # Days
@@ -217,7 +216,7 @@ def setup_analytics_system(app: "FastAPI"):
                 )
             coins = float(blockchain_balance.text)
         else:
-            coins = 0
+            coins = get_fake_coins()
 
         # Fake chart logic
         days = int(coins / 2)

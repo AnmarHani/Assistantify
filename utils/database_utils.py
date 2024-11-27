@@ -14,7 +14,13 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
+fake_coins = 0
+def get_fake_coins():
+    return fake_coins
 
+def add_fake_coins():
+    fake_coins = fake_coins + 1
+    return fake_coins
 
 # Database setup
 

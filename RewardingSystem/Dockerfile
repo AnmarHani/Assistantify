@@ -48,6 +48,9 @@ ENTRYPOINT ["ganache", "--host=0.0.0.0", \
 
 # TO UPDATE THE IMAGE
 # docker build . --platform linux/amd64 -t atn_reward_system
+# docker tag atn_reward_system anmarhani/atn_reward_system
+# docker push anmarhani/atn_reward_system 
+# docker build . --platform linux/amd64 -t atn_api_gateway
 # docker tag atn_api_gateway anmarhani/atn_api_gateway
 # docker push anmarhani/atn_api_gateway 
 

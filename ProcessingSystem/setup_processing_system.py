@@ -23,7 +23,7 @@ from AnalyticsSystem.prompt_functions import (
 )
 from utils.authentication_utils import get_current_user
 from utils.constants import GPT_MODEL, VOICE_MODEL, BASE_URL
-from utils.database_utils import User, get_db
+from utils.database_utils import User, get_db, get_fake_coins, add_fake_coins
 
 if TYPE_CHECKING:
     from fastapi import FastAPI
@@ -79,7 +79,7 @@ async def send_to_gpt(message: str, user, db: Session):
                     data=json.dumps({"account_address": f"{user.blockchain_account}"}),
                 )
         else:
-            print("Rewarded")
+            add_fake_coins()
 
     if "ADD_STOCK" in response_text:
         ACTION_ID = "ADD_STOCK"
@@ -172,7 +172,7 @@ def setup_processing_system(app: "FastAPI"):
 
             coins = blockchain_balance.text
         else:
-            coins = 0
+            coins = get_fake_coins()
 
         return {"bot_message": gpt_response, "coins": coins}
 
@@ -225,7 +225,7 @@ def setup_processing_system(app: "FastAPI"):
 
             coins = blockchain_balance.text
         else:
-            coins = 0
+            coins = get_fake_coins()
 
         # Step 3: Return the mp3 file path as a response
         return {
@@ -257,6 +257,6 @@ def setup_processing_system(app: "FastAPI"):
 
             coins = blockchain_balance.text
         else:
-            coins = 0
+            coins = get_fake_coins()
 
         return {"bot_message": response, "coins": coins}
