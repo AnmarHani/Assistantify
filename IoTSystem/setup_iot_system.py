@@ -10,9 +10,14 @@ if TYPE_CHECKING:
     from fastapi import FastAPI
 
 is_broadlink_enabled = False
+is_slides_enabled = True
 is_IOT_enabled = True
 
-
+if is_slides_enabled:
+    # Change the SSID and Password of your WiFi Network
+    broadlink.setup('TAHMAL', "*cB222333", 4)
+    LEFT_SLIDE_IR_CODE = b''
+    RIGHT_SLIDE_IR_CODE = b''
 
 if is_broadlink_enabled:
     # Change the SSID and Password of your WiFi Network
@@ -57,8 +62,8 @@ if is_IOT_enabled:
     client.on_connect = on_connect
 
     # enable TLS for secure connection
-    # client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
-    client.tls_set(tls_version=ssl.PROTOCOL_TLS)
+    client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
+    # client.tls_set(tls_version=ssl.PROTOCOL_TLS)
     # set username and password
     client.username_pw_set("ATN_IOT_SYSTEM", "Wasd1234")
     # connect to HiveMQ Cloud on port 8883 (default for MQTT)
@@ -66,6 +71,17 @@ if is_IOT_enabled:
 
 
 def setup_iot_system(app: "FastAPI"):
+    if is_slides_enabled:
+        @app.get("/TURN_LEFT_SLIDE")
+        def turn_left_slide():
+            device.send_data(LEFT_SLIDE_IR_CODE)
+            return "Turned Slide Left"
+
+        @app.get("/TURN_RIGHT_SLIDE")
+        def turn_right_slide():
+            device.send_data(RIGHT_SLIDE_IR_CODE)
+            return "Turned Slide Right"
+        
     if is_broadlink_enabled:
         @app.get("/device_on")
         def blitz_on():

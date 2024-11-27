@@ -50,7 +50,7 @@ async def send_to_gpt(message: str, user, db: Session):
     content = f"""
         Your name is Assistantify (A Personal Assistant System), you are helping {user.username},
         You will do one of two things, either 1. Answer (Suggestion, Prediction) Based on {user.username}'s data or 2. Action (Reward, Send Action From List)
-        Actions list = [LIGHTS_ON, LIGHTS_OFF, REW_ATN, ADD_STOCK, REM_STOCK], You can only send a reward action based on {user.username} behaviour on their message, if they did good (Other Answers, or bad actions should be ignored as for rewarding action) based on the data, append to the message you will say You will get rewarded with 1 ATN (which is the Coin for rewards).
+        Actions list = [LEFT_SLIDE, RIGHT_SLIDE, LIGHTS_ON, LIGHTS_OFF, REW_ATN, ADD_STOCK, REM_STOCK], You can only send a reward action based on {user.username} behaviour on their message, if they did good (Other Answers, or bad actions should be ignored as for rewarding action) based on the data, append to the message you will say You will get rewarded with 1 ATN (which is the Coin for rewards).
         Action Description: REW_ATN [REW_ATN, <ATN_VALUE>], ADD_STOCK [ADD_STOCK, <STOCK_NAME>, <STOCK_PRICE>, <STOCK_NUM>].
         When choosing an action (you can make multiple actions) based on user message or automatically, please write the action with the same format in the action description [ADD_STOCK, ..entries] or [REW_ATN, ..entries], I will read it from your response and extract the entries.
         with data: {finance_prompt(user, db)}, {health_prompt(user, db)}, {productivity_prompt(user, db)} in the financial, health, and productivity life domains respectively. 
@@ -96,6 +96,26 @@ async def send_to_gpt(message: str, user, db: Session):
             async with httpx.AsyncClient() as client:
                 await client.get(
                     f"{BASE_URL}/LED_OFF",
+                    headers={"Content-Type": "application/json"},
+                )
+        else:
+            response_text += "IoT Service Disabled"
+
+    if "LEFT_SLIDE" in response_text:
+        if os.getenv("IOT_ENV") == "True":
+            async with httpx.AsyncClient() as client:
+                await client.get(
+                    f"{BASE_URL}/TURN_LEFT_SLIDE",
+                    headers={"Content-Type": "application/json"},
+                )
+        else:
+            response_text += "IoT Service Disabled"
+
+    if "RIGHT_SLIDE" in response_text:
+        if os.getenv("IOT_ENV") == "True":
+            async with httpx.AsyncClient() as client:
+                await client.get(
+                    f"{BASE_URL}/TURN_RIGHT_SLIDE",
                     headers={"Content-Type": "application/json"},
                 )
         else:
@@ -225,7 +245,7 @@ def setup_processing_system(app: "FastAPI"):
 
         # Step 1: Transcribe the audio using Whisper (assume transcribe_audio() is defined)
         voice_to_text = await transcribe_audio(temp_wav_path)
-
+    
         user: User = db.query(User).filter(User.username == current_user).first()
         gpt_response = await send_to_gpt(voice_to_text, user, db)
 
