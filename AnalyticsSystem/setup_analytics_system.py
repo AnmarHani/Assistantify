@@ -9,13 +9,39 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from utils.authentication_utils import get_current_user
 from utils.constants import BASE_URL
-from utils.database_utils import Finance, Health, Productivity, User, Transaction, get_db, get_fake_coins
+from utils.database_utils import (
+    Finance,
+    Health,
+    Productivity,
+    User,
+    Transaction,
+    get_db,
+    get_fake_coins,
+)
+
 
 class ChartResponse(BaseModel):
     x: list[int]  # Days
     y: list[float]  # Coins
+
+
 if TYPE_CHECKING:
     from fastapi import FastAPI
+
+
+def equalize_axes(x: list, y: list):
+    """Equalize lengths of x and y by padding the shorter list with zeroes."""
+    max_length = max(len(x), len(y))
+    x = x + [0] * (max_length - len(x))
+    y = y + [0] * (max_length - len(y))
+    return x, y
+
+def normalize_chart_data(data: dict):
+    """Normalize all x, y pairs in the data dictionary."""
+    for key, value in data.items():
+        value["x"], value["y"] = equalize_axes(value["x"], value["y"])
+    return data
+
 
 def calculate_tdee(weight, height=170, age=30, gender="male", activity_level=1.55):
     if gender == "male":
@@ -24,6 +50,7 @@ def calculate_tdee(weight, height=170, age=30, gender="male", activity_level=1.5
         bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age)
     tdee = bmr * activity_level
     return tdee
+
 
 def format_productivity_data(tasks, hours, days):
     """Helper function to format productivity data for cleaner JSON."""
@@ -36,18 +63,20 @@ def format_productivity_data(tasks, hours, days):
         formatted_data[day] = day_data
     return formatted_data
 
+
 def setup_analytics_system(app: "FastAPI"):
     @app.get("/all_analysis", response_model=dict)
     def analysis(
-        current_user: str = Depends(get_current_user), 
-        db: Session = Depends(get_db)
+        current_user: str = Depends(get_current_user), db: Session = Depends(get_db)
     ):
         user = db.query(User).filter(User.username == current_user).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
         # Fetching productivity data
-        productivity_data = db.query(Productivity).filter(Productivity.user_id == user.id).first()
+        productivity_data = (
+            db.query(Productivity).filter(Productivity.user_id == user.id).first()
+        )
         if not productivity_data:
             raise HTTPException(status_code=404, detail="Productivity data not found")
 
@@ -58,25 +87,25 @@ def setup_analytics_system(app: "FastAPI"):
                 "y": [
                     productivity_data.daily_tasks_completed,
                     productivity_data.weekly_tasks_completed,
-                    productivity_data.monthly_tasks_completed
-                ]
+                    productivity_data.monthly_tasks_completed,
+                ],
             },
             "hours_worked": {
                 "x": ["Daily", "Weekly", "Monthly"],
                 "y": [
                     productivity_data.hours_worked_daily,
                     productivity_data.hours_worked_weekly,
-                    productivity_data.hours_worked_monthly
-                ]
+                    productivity_data.hours_worked_monthly,
+                ],
             },
             "breaks_taken": {
                 "x": ["Daily", "Weekly", "Monthly"],
                 "y": [
                     productivity_data.breaks_taken_daily,
                     productivity_data.breaks_taken_weekly,
-                    productivity_data.breaks_taken_monthly
-                ]
-            }
+                    productivity_data.breaks_taken_monthly,
+                ],
+            },
         }
 
         # Fetching finance data
@@ -92,8 +121,8 @@ def setup_analytics_system(app: "FastAPI"):
                     float(finance_data.expenses),
                     float(finance_data.savings),
                     float(finance_data.investments),
-                    float(finance_data.debts)
-                ]
+                    float(finance_data.debts),
+                ],
             }
         }
 
@@ -108,22 +137,22 @@ def setup_analytics_system(app: "FastAPI"):
         daily_calories = [float(record.daily_calorie) for record in health_data]
 
         health_analysis = {
-            "weight_over_time": {
-                "x": dates,
-                "y": weights
-            },
-            "calories_over_time": {
-                "x": dates,
-                "y": daily_calories
-            }
+            "weight_over_time": {"x": dates, "y": weights},
+            "calories_over_time": {"x": dates, "y": daily_calories},
         }
 
-        # Returning a clean and structured JSON format
+        # Normalize chart data
+        productivity_analysis = normalize_chart_data(productivity_analysis)
+        finance_analysis = normalize_chart_data(finance_analysis)
+        health_analysis = normalize_chart_data(health_analysis)
+
+        # Return normalized data
         return {
             "productivity_analysis": productivity_analysis,
             "finance_analysis": finance_analysis,
             "health_analysis": health_analysis,
         }
+
     @app.get("/user/transactions/analysis")
     def analyze_transactions(
         current_user: str = Depends(get_current_user),
@@ -134,14 +163,20 @@ def setup_analytics_system(app: "FastAPI"):
             raise HTTPException(status_code=404, detail="User not found")
 
         # Fetch all transactions related to the user
-        transactions = db.query(Transaction).filter(Transaction.user_id == user.id).all()
+        transactions = (
+            db.query(Transaction).filter(Transaction.user_id == user.id).all()
+        )
 
         # Normalize transaction types to handle possible typos or variations
         total_income = sum(
-            t.transaction_amount for t in transactions if t.transaction_type.lower() == "deposit"
+            t.transaction_amount
+            for t in transactions
+            if t.transaction_type.lower() == "deposit"
         )
         total_expenses = sum(
-            t.transaction_amount for t in transactions if t.transaction_type.lower() == "withdraw"
+            t.transaction_amount
+            for t in transactions
+            if t.transaction_type.lower() == "withdraw"
         )
 
         # Categorized income and expenses
@@ -184,7 +219,6 @@ def setup_analytics_system(app: "FastAPI"):
             for t in transactions
         ]
 
-        
         return {
             "total_income": total_income,
             "total_expenses": total_expenses,
@@ -196,11 +230,9 @@ def setup_analytics_system(app: "FastAPI"):
             "all_transactions": all_transactions,
         }
 
-
     @app.get("/general_analysis", response_model=ChartResponse)
     async def get_real_atn_chart(
-        current_user: User = Depends(get_current_user), 
-        db: Session = Depends(get_db)
+        current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
     ):
         user = db.query(User).filter(User.id == current_user.id).first()
         if not user:
@@ -222,6 +254,7 @@ def setup_analytics_system(app: "FastAPI"):
         days = int(coins / 2)
         x = list(range(1, days + 1))  # Array of days
         y = [i * 2 for i in x]  # Array of coins
+        # Equalize axes
+        x, y = equalize_axes(x, y)
 
         return {"x": x, "y": y}
-
