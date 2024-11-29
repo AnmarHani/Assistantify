@@ -59,8 +59,7 @@ As mentioned before, we use client-server architecture, so we have frontend, bac
 ## Resources and Appendices
 - [Assistantify Report Document](https://drive.google.com/file/d/1vPKCSpOyrotmcOq4Kka363s3UPwBxtoO/view?usp=sharing)
 - [Assistantify Website Portofolio](https://orchid-guests-837422.framer.app/)
-- Assistantify Mobile Application - Not Yet Produced.
-<!-- https://app.flutterflow.io/share/assistentify-b1d861 -->
+- [Assistantify Mobile Application](https://app.flutterflow.io/share/assistentify-b1d861)
 - [Assistantify UI/UX Design](https://www.figma.com/design/8URmvkc1i4al4VVC1VRi77/M%26A?node-id=633-3262&t=RPuHQ154oMqLt1LM-1)
 - [Assistantify API Docker Image](https://hub.docker.com/repository/docker/anmarhani/atn_api_gateway/general)
 - [First Assistantify Presentation](https://docs.google.com/presentation/d/107feGcTtZRH_q4gXdaBesl2loShJhqCV/edit?usp=sharing&ouid=115724437142488427456&rtpof=true&sd=true)
