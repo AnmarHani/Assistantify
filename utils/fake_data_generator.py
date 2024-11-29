@@ -3,7 +3,8 @@ import random
 from faker import Faker
 from sqlalchemy.orm import Session
 
-from utils.database_utils import Finance, Health, Productivity
+from utils.database_utils import Finance, Health, Productivity, Transaction
+import datetime
 
 fake = Faker()
 
@@ -88,6 +89,93 @@ def generate_real_data(user_id):
 
     return real_health_data, real_finance_data, real_productivity_data
 
+
+def generate_real_data_ziyad(user_id):
+    real_health_data = Health(
+        user_id=user_id,
+        allergies="['Lactose']",
+        daily_calorie=2500,  
+        fav_food='Burger, Pizza, Chicken with Rice (Saudi Arabian Kabsa)',
+        weight=82,  
+        medical_conditions='Lactose Intolerance',
+        avg_heart_beat=80,
+        exercise_routine="Push Pull Legs",  # Updated exercise routine
+        rest_days=2,  # 2 days of rest per week
+        daily_steps=10000,  # Assuming 10,000 steps per day
+        workout_hours=1.5,  # Average workout duration in hours
+        diet_choices="High protein, moderate carbs, low lactose",  # Diet preference
+        stress_quality="Low",  # Stress level
+        height=175  # Assuming height in cm
+    )
+
+
+    real_finance_data = Finance(
+        user_id=user_id,
+        income=990,  
+        expenses=200,  
+        savings=790,  
+        investments=50,  
+        debts=0,  
+        credit_score=700,  
+        financial_goals="['Saving to buy a house']",
+        monthly_budget=990  
+    )
+
+   
+    real_productivity_data = Productivity(
+        user_id=user_id,
+        daily_tasks_completed=5,  
+        weekly_tasks_completed=25,  
+        monthly_tasks_completed=100,  
+        hours_worked_daily=8,  
+        hours_worked_weekly=40,  
+        hours_worked_monthly=160,  
+        breaks_taken_daily=2,  
+        breaks_taken_weekly=10,  
+        breaks_taken_monthly=40  
+    )
+
+   
+    real_transaction_data = [
+        Transaction(
+            user_id=user_id,
+            transaction_amount=50.0,
+            transaction_type='expense',
+            transaction_reason='Groceries',
+            timestamp=datetime.datetime.utcnow()
+        ),
+        Transaction(
+            user_id=user_id,
+            transaction_amount=200.0,
+            transaction_type='income',
+            transaction_reason='Salary',
+            timestamp=datetime.datetime.utcnow()
+        ),
+        Transaction(
+            user_id=user_id,
+            transaction_amount=15.0,
+            transaction_type='expense',
+            transaction_reason='Transportation',
+            timestamp=datetime.datetime.utcnow()
+        ),
+        Transaction(
+            user_id=user_id,
+            transaction_amount=30.0,
+            transaction_type='expense',
+            transaction_reason='Dining Out',
+            timestamp=datetime.datetime.utcnow()
+        ),
+        Transaction(
+            user_id=user_id,
+            transaction_amount=100.0,
+            transaction_type='income',
+            transaction_reason='Freelance Work',
+            timestamp=datetime.datetime.utcnow()
+        ),
+    ]
+
+    return real_health_data, real_finance_data, real_productivity_data, real_transaction_data
+
 def insert_fake_data(db: Session, user_id: int, fake: bool = True):
     if fake:
         health_data, finance_data, productivity_data = generate_fake_data(user_id)
@@ -97,9 +185,11 @@ def insert_fake_data(db: Session, user_id: int, fake: bool = True):
         db.commit()
         return
     
-    real_health_data, real_finance_data, real_productivity_data = generate_real_data(user_id)
+    real_health_data, real_finance_data, real_productivity_data, real_transaction_data = generate_real_data_ziyad(user_id)
     db.add(real_health_data)
     db.add(real_finance_data)
     db.add(real_productivity_data)
+    for transaction in real_transaction_data:
+        db.add(transaction)
     db.commit()
     

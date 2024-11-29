@@ -8668,10 +8668,22 @@
       "links": {},
       "address": "0xD0f6B70829df58CEb5f53Eb3419202fFCDC1936f",
       "transactionHash": "0x84e0b969c4a0ac3a3ffbd057ebc792b4d825b5b07caefc8c81a563cdad0bc1d8"
+    },
+    "1732771978226": {
+      "events": {},
+      "links": {},
+      "address": "0xe35bE311b71876c5c45a81762bF1e14f6f4ACC8d",
+      "transactionHash": "0xba44a5bc523d0e384827464dbda10ba3329ecabe463d4f6bbd474684fe6052a8"
+    },
+    "1732777801395": {
+      "events": {},
+      "links": {},
+      "address": "0x2b7ac3A29c88DcF13e6BF98771fAA7b4440ae38C",
+      "transactionHash": "0xfac6a31135867a936952f6445ffaa30af2a51782ddc86d8e2989fb2929c1cbd5"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-11-27T10:02:48.124Z",
+  "updatedAt": "2024-11-28T07:13:26.378Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

@@ -62,12 +62,14 @@ if is_IOT_enabled:
     client.on_connect = on_connect
 
     # enable TLS for secure connection
-    client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
+    # client.tls_set(tls_version=mqtt.client.ssl.PROTOCOL_TLS)
     # client.tls_set(tls_version=ssl.PROTOCOL_TLS)
+    client.tls_set(tls_version=ssl.PROTOCOL_TLSv1_2)
     # set username and password
     client.username_pw_set("ATN_IOT_SYSTEM", "Wasd1234")
     # connect to HiveMQ Cloud on port 8883 (default for MQTT)
     client.connect("298321207d58431bb997da06e6cd2ca4.s1.eu.hivemq.cloud", 8883)
+    client.loop_start()
 
 
 def setup_iot_system(app: "FastAPI"):
