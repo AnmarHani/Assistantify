@@ -1,10 +1,10 @@
-<div style="width:'100%';display:'flex';justify-content:'center';align-items:'center';flex-direction: column;">
-  <img width="1282" alt="Enterpneurship and Best Projects University Event Banner" src="https://github.com/user-attachments/assets/c9513b5d-1a2e-4b2d-908c-f86c46c32c72">
+<div align="center">
+  <img width="1282" alt="Enterpneurship and Best Projects University Event Banner" src="https://github.com/user-attachments/assets/c9513b5d-1a2e-4b2d-908c-f86c46c32c72" />
   <h3>One of the top projects in University of Jeddah - 2024</h3>
-  <div style="width:'100%';display:'flex';justify-content:'center';align-items:'center';">
-  <img width="294" alt="Screenshot 2024-11-29 at 8 42 40 PM" src="https://github.com/user-attachments/assets/cb48ba4b-6fac-4378-9416-ff90480551fc">
-    <img src="https://github.com/user-attachments/assets/3c4f5824-80d3-4e84-a495-20bd83640650">
-  <img width="343" alt="Screenshot 2024-11-29 at 8 42 47 PM" src="https://github.com/user-attachments/assets/0c2a02e6-a167-4a6b-9b39-c151e8ff18f7">
+  <div>
+    <img width="294" alt="Screenshot 2024-11-29 at 8 42 40 PM" src="https://github.com/user-attachments/assets/cb48ba4b-6fac-4378-9416-ff90480551fc" />
+    <img src="https://github.com/user-attachments/assets/3c4f5824-80d3-4e84-a495-20bd83640650" />
+    <img width="343" alt="Screenshot 2024-11-29 at 8 42 47 PM" src="https://github.com/user-attachments/assets/0c2a02e6-a167-4a6b-9b39-c151e8ff18f7" />
   </div>
 </div>
 
