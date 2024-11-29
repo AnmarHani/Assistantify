@@ -20,7 +20,7 @@ Assistantify is an innovative AI-powered personal assistant product designed to 
 
 ## Overall Context Diagram
 
-![Context Diagram]([https://github.com/user-attachments/assets/1a050f53-0c0b-4fb1-a953-f79257c71c64)
+![Context Diagram](https://github.com/user-attachments/assets/1a050f53-0c0b-4fb1-a953-f79257c71c64)
 
 
 ## Technologies Used
