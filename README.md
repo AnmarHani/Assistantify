@@ -1,12 +1,11 @@
-<div align="center">
-  <img width="1282" alt="Enterpneurship and Best Projects University Event Banner" src="https://github.com/user-attachments/assets/c9513b5d-1a2e-4b2d-908c-f86c46c32c72" />
-  <h3>One of the top projects in University of Jeddah - 2024</h3>
-  <div>
-    <img width="294" alt="Screenshot 2024-11-29 at 8 42 40 PM" src="https://github.com/user-attachments/assets/cb48ba4b-6fac-4378-9416-ff90480551fc" />
-    <img src="https://github.com/user-attachments/assets/3c4f5824-80d3-4e84-a495-20bd83640650" />
-    <img width="343" alt="Screenshot 2024-11-29 at 8 42 47 PM" src="https://github.com/user-attachments/assets/0c2a02e6-a167-4a6b-9b39-c151e8ff18f7" />
-  </div>
-</div>
+![Banner](https://github.com/user-attachments/assets/c9513b5d-1a2e-4b2d-908c-f86c46c32c72)
+
+### One of the top projects in University of Jeddah - 2024
+
+![University Logo](https://github.com/user-attachments/assets/cb48ba4b-6fac-4378-9416-ff90480551fc)
+![Assistantify Logo](https://github.com/user-attachments/assets/3c4f5824-80d3-4e84-a495-20bd83640650)
+![University's Partner Logo](https://github.com/user-attachments/assets/0c2a02e6-a167-4a6b-9b39-c151e8ff18f7)
+
 
 # Assistantify 
 Assistantify is an innovative AI-powered personal assistant product designed to provide highly personalized assistance and lifestyle management. It stands out by offering a unique blend of features that cater to individual preferences and needs across various domains such as health, finance, fitness, and productivity. By integrating with a user's digital ecosystem, Assistantify aims to deliver actionable insights and recommendations that are tailored to each user's life. Assistantify is not only a “mobile app” it is a middleware that connects apps or devices with the user but in a smart “AI” personalized way. Leveraging new tech trends such as AI, Big Data, Cloud, IoT, Blockchain, AR/VR, etc.
