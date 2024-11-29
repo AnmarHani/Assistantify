@@ -28,6 +28,25 @@ class ChartResponse(BaseModel):
 if TYPE_CHECKING:
     from fastapi import FastAPI
 
+from datetime import datetime
+
+def convert_dates_to_integers(dates: list):
+    """Convert date strings to integers based on the relative difference in days."""
+    try:
+        # Parse dates and calculate day differences from the first date
+        parsed_dates = [datetime.strptime(date, "%Y-%m-%d") for date in dates]
+        base_date = parsed_dates[0]
+        return [(date - base_date).days + 1 for date in parsed_dates]
+    except Exception as e:
+        raise ValueError(f"Error processing dates: {e}")
+
+def preprocess_chart_data(data: dict):
+    """Convert date-based x values to sequential integers."""
+    for key, value in data.items():
+        if all(isinstance(x, str) and "-" in x for x in value["x"]):
+            # If x-axis contains date strings, convert them to integers
+            value["x"] = convert_dates_to_integers(value["x"])
+    return data
 
 def equalize_axes(x: list, y: list):
     """Equalize lengths of x and y by padding the shorter list with zeroes."""
@@ -38,6 +57,7 @@ def equalize_axes(x: list, y: list):
 
 def normalize_chart_data(data: dict):
     """Normalize all x, y pairs in the data dictionary."""
+    data = preprocess_chart_data(data)
     for key, value in data.items():
         value["x"], value["y"] = equalize_axes(value["x"], value["y"])
     return data
@@ -83,7 +103,7 @@ def setup_analytics_system(app: "FastAPI"):
         # Format productivity data with x and y values
         productivity_analysis = {
             "tasks_completed": {
-                "x": ["Daily", "Weekly", "Monthly"],
+                "x": [1, 2, 3],
                 "y": [
                     productivity_data.daily_tasks_completed,
                     productivity_data.weekly_tasks_completed,
@@ -91,7 +111,7 @@ def setup_analytics_system(app: "FastAPI"):
                 ],
             },
             "hours_worked": {
-                "x": ["Daily", "Weekly", "Monthly"],
+                "x": [1, 2, 3],
                 "y": [
                     productivity_data.hours_worked_daily,
                     productivity_data.hours_worked_weekly,
@@ -99,7 +119,7 @@ def setup_analytics_system(app: "FastAPI"):
                 ],
             },
             "breaks_taken": {
-                "x": ["Daily", "Weekly", "Monthly"],
+                "x": [1, 2, 3],
                 "y": [
                     productivity_data.breaks_taken_daily,
                     productivity_data.breaks_taken_weekly,
@@ -115,7 +135,7 @@ def setup_analytics_system(app: "FastAPI"):
 
         finance_analysis = {
             "finance_breakdown": {
-                "x": ["Income", "Expenses", "Savings", "Investments", "Debts"],
+                "x": [1, 2, 3, 4, 5],
                 "y": [
                     float(finance_data.income),
                     float(finance_data.expenses),
@@ -234,7 +254,7 @@ def setup_analytics_system(app: "FastAPI"):
     async def get_real_atn_chart(
         current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
     ):
-        user = db.query(User).filter(User.id == current_user.id).first()
+        user: User = db.query(User).filter(User.username == current_user).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
