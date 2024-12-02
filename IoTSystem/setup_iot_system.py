@@ -9,9 +9,9 @@ import ssl
 if TYPE_CHECKING:
     from fastapi import FastAPI
 
-is_broadlink_enabled = False
-is_slides_enabled = True
-is_IOT_enabled = True
+is_broadlink_enabled = True
+is_slides_enabled = False
+is_IOT_enabled = False
 
 if is_slides_enabled:
     # Change the SSID and Password of your WiFi Network
@@ -21,7 +21,7 @@ if is_slides_enabled:
 
 if is_broadlink_enabled:
     # Change the SSID and Password of your WiFi Network
-    broadlink.setup('TAHMAL', "*cB222333", 4)
+    broadlink.setup('SEC3', "SEC232323", 4)
 
     TURN_ON_BLITZ = b'&\x00`\x00\x00\x01!\x8e\x135\x13\x11\x12\x12\x13\x11\x13\x11\x13\x11\x12\x12\x12\x11\x13\x11\x135\x135\x125\x135\x125\x144\x135\x125\x135\x135\x13\x11\x12\x12\x12\x11\x13\x11\x13\x11\x12\x12\x13\x11\x13\x11\x134\x135\x125\x145\x125\x13\x00\x04\xfc\x00\x01 G\x13\x00\x0b\xfa\x00\x01!G\x13\x00\x0b\xfa\x00\x01!F\x13\x00\r\x05'
     TURN_OFF_BLITZ = b'&\x00X\x00\x00\x01\x1f\x91\x116\x11\x13\x11\x13\x11\x12\x12\x12\x11\x13\x12\x13\x11\x12\x12\x12\x116\x126\x117\x126\x116\x116\x127\x116\x126\x116\x11\x14\x11\x13\x11\x12\x12\x12\x11\x13\x11\x13\x11\x12\x12\x13\x116\x126\x116\x126\x117\x11\x00\x04\xfe\x00\x01\x1eI\x12\x00\x0b\xfb\x00\x01 H\x11\x00\r\x05'
@@ -30,29 +30,32 @@ if is_broadlink_enabled:
 
     try:
         devices = broadlink.discover(timeout=10)
+        print(devices)
         device = devices[0]
         device.auth()
     except:
         print("No devices found")
         exit()
 
-
     def learn_ir_code():
+        device.enter_learning()
         start = time.time()
         while time.time() - start < 20:
             time.sleep(1)
             try:
                 data = device.check_data()
+                if data:
+                    return data
             except:
                 print("No data received")
-                return
-            else:
-                return data
+    # device.send_data(PACKET)
+    # print("Learning IR Code " + str(learn_ir_code()))
 
 
 if is_IOT_enabled:
     print("OK?")
     # setting callbacks for different events to see if it works, print the message etc.
+
     def on_connect(client, userdata, flags, rc, properties=None):
         print("CONNACK received with code %s." % rc)
 
@@ -83,7 +86,7 @@ def setup_iot_system(app: "FastAPI"):
         def turn_right_slide():
             device.send_data(RIGHT_SLIDE_IR_CODE)
             return "Turned Slide Right"
-        
+
     if is_broadlink_enabled:
         @app.get("/device_on")
         def blitz_on():
@@ -104,11 +107,8 @@ def setup_iot_system(app: "FastAPI"):
         def turn_LED_ON():
             client.publish("ATN/led", payload="ON", qos=1)
             return "Sent!"
-            
+
         @app.get("/LED_OFF")
         def turn_LED_ON():
             client.publish("ATN/led", payload="OFF", qos=1)
             return "Sent!"
-
-
-
